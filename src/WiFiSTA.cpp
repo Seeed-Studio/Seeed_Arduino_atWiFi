@@ -11,15 +11,15 @@ extern "C" {
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include <esp_err.h>
-#include <esp_wifi.h>
-#include <esp_event_loop.h>
-#include <esp32-hal.h>
-#include <lwip/ip_addr.h>
-#include "lwip/err.h"
-#include "lwip/dns.h"
-#include <esp_smartconfig.h>
-#include <tcpip_adapter.h>
+// #include <esp_err.h>
+// #include <esp_wifi.h>
+// #include <esp_event_loop.h>
+// #include <esp32-hal.h>
+// #include <lwip/ip_addr.h>
+// #include "lwip/err.h"
+// #include "lwip/dns.h"
+// #include <esp_smartconfig.h>
+// #include <tcpip_adapter.h>
 }
 
 // // -----------------------------------------------------------------------------------------------------------------------
@@ -46,11 +46,7 @@ extern "C" {
 // ---------------------------------------------------- STA function -----------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-struct WifiToken{
-    String ssid;
-    String pwd;
-    mac    bssid;
-}token;
+WifiToken token;
 
 bool WiFiSTAClass::_autoReconnect = true;
 bool WiFiSTAClass::_useStaticIp = false;
@@ -438,8 +434,7 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
  * is STA interface connected?
  * @return true if STA is connected to an AD
  */
-bool WiFiSTAClass::isConnected()
-{
+bool WiFiSTAClass::isConnected(){
     return (status() == WL_CONNECTED);
 }
 
@@ -450,8 +445,7 @@ bool WiFiSTAClass::isConnected()
  * @param autoConnect bool
  * @return if saved
  */
-bool WiFiSTAClass::setAutoConnect(bool autoConnect)
-{
+bool WiFiSTAClass::setAutoConnect(bool autoConnect){
     /*bool ret;
     ret = esp_wifi_set_auto_connect(autoConnect);
     return ret;*/
@@ -463,22 +457,19 @@ bool WiFiSTAClass::setAutoConnect(bool autoConnect)
  * automatically or not when it is powered on.
  * @return auto connect
  */
-bool WiFiSTAClass::getAutoConnect()
-{
+bool WiFiSTAClass::getAutoConnect(){
     /*bool autoConnect;
     esp_wifi_get_auto_connect(&autoConnect);
     return autoConnect;*/
     return false;//now deprecated
 }
 
-bool WiFiSTAClass::setAutoReconnect(bool autoReconnect)
-{
+bool WiFiSTAClass::setAutoReconnect(bool autoReconnect){
     _autoReconnect = autoReconnect;
     return true;
 }
 
-bool WiFiSTAClass::getAutoReconnect()
-{
+bool WiFiSTAClass::getAutoReconnect(){
     return _autoReconnect;
 }
 
@@ -487,8 +478,7 @@ bool WiFiSTAClass::getAutoReconnect()
  * returns the status reached or disconnect if STA is off
  * @return wl_status_t
  */
-uint8_t WiFiSTAClass::waitForConnectResult()
-{
+uint8_t WiFiSTAClass::waitForConnectResult(){
     //1 and 3 have STA enabled
     if((WiFiGenericClass::getMode() & WIFI_MODE_STA) == 0) {
         return WL_DISCONNECTED;
@@ -504,14 +494,21 @@ uint8_t WiFiSTAClass::waitForConnectResult()
  * Get the station interface IP address.
  * @return IPAddress station IP
  */
-IPAddress WiFiSTAClass::localIP()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+IPAddress WiFiSTAClass::localIP(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPAddress();
+    // }
+    // tcpip_adapter_ip_info_t ip;
+    // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
+    // return IPAddress(ip.ip.addr);
+    ipv4 ip;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-    return IPAddress(ip.ip.addr);
+    if (atStationIp(& ip) == fail){
+        return false;
+    }
+    return IPAddress((ip_addr_t *) & ip);
 }
 
 
@@ -520,32 +517,39 @@ IPAddress WiFiSTAClass::localIP()
  * @param mac   pointer to uint8_t array with length WL_MAC_ADDR_LENGTH
  * @return      pointer to uint8_t *
  */
-uint8_t* WiFiSTAClass::macAddress(uint8_t* mac)
-{
-    if(WiFiGenericClass::getMode() != WIFI_MODE_NULL){
-        esp_wifi_get_mac(WIFI_IF_STA, mac);	
-    }
-    else{
-        esp_read_mac(mac, ESP_MAC_WIFI_STA);
-    }
-    return mac;
+uint8_t* WiFiSTAClass::macAddress(uint8_t* bssid){
+    // if(WiFiGenericClass::getMode() != WIFI_MODE_NULL){
+    //     esp_wifi_get_mac(WIFI_IF_STA, mac);	
+    // }
+    // else{
+    //     esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    // }
+    // return mac;
+    
+    atStationMac((mac *)bssid);
+    return bssid;
 }
 
 /**
  * Get the station interface MAC address.
  * @return String mac
  */
-String WiFiSTAClass::macAddress(void)
-{
-    uint8_t mac[6];
+String WiFiSTAClass::macAddress(void){
+    // uint8_t mac[6];
+    // char macStr[18] = { 0 };
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     esp_read_mac(mac, ESP_MAC_WIFI_STA);
+    // }
+    // else{
+    //     esp_wifi_get_mac(WIFI_IF_STA, mac);
+    // }
+    // sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    // return String(macStr);
+
+    mac  bssid;
     char macStr[18] = { 0 };
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
-        esp_read_mac(mac, ESP_MAC_WIFI_STA);
-    }
-    else{
-        esp_wifi_get_mac(WIFI_IF_STA, mac);
-    }
-    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+    atStationMac(& bssid);
+    sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
     return String(macStr);
 }
 
@@ -553,28 +557,40 @@ String WiFiSTAClass::macAddress(void)
  * Get the interface subnet mask address.
  * @return IPAddress subnetMask
  */
-IPAddress WiFiSTAClass::subnetMask()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+IPAddress WiFiSTAClass::subnetMask(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPAddress();
+    // }
+    // tcpip_adapter_ip_info_t ip;
+    // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
+    // return IPAddress(ip.netmask.addr);
+
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-    return IPAddress(ip.netmask.addr);
+    ipv4 ip;
+    atStationIp(& ip);
+    return IPAddress((ip_addr_t *) & ip);
 }
 
 /**
  * Get the gateway ip address.
  * @return IPAddress gatewayIP
  */
-IPAddress WiFiSTAClass::gatewayIP()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+IPAddress WiFiSTAClass::gatewayIP(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPAddress();
+    // }
+    // tcpip_adapter_ip_info_t ip;
+    // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
+    // return IPAddress(ip.gw.addr);
+
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-    return IPAddress(ip.gw.addr);
+    ipv4 ip, gw;
+    atStationIp(& ip, & gw);
+    return IPAddress((ip_addr_t *) & gw);
 }
 
 /**
@@ -582,69 +598,111 @@ IPAddress WiFiSTAClass::gatewayIP()
  * @param dns_no
  * @return IPAddress DNS Server IP
  */
-IPAddress WiFiSTAClass::dnsIP(uint8_t dns_no)
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+IPAddress WiFiSTAClass::dnsIP(uint8_t dns_no){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPAddress();
+    // }
+    // ip_addr_t dns_ip = dns_getserver(dns_no);
+    // return IPAddress(dns_ip.u_addr.ip4.addr);
+
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    ip_addr_t dns_ip = dns_getserver(dns_no);
-    return IPAddress(dns_ip.u_addr.ip4.addr);
+    ipv4 dns[2];
+    atDns(dns, dns + 1);
+    return IPAddress((ip_addr_t *)dns + dns_no);
 }
 
 /**
  * Get the broadcast ip address.
  * @return IPAddress broadcastIP
  */
-IPAddress WiFiSTAClass::broadcastIP()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+IPAddress WiFiSTAClass::broadcastIP(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPAddress();
+    // }
+    // tcpip_adapter_ip_info_t ip;
+    // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
+    // return WiFiGenericClass::calculateBroadcast(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
+
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-    return WiFiGenericClass::calculateBroadcast(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
+
+    ipv4 ip, gw, mask;
+    atStationIp(& ip, & gw, & mask);
+    return WiFiGenericClass::calculateBroadcast(
+        IPAddress((ip_addr_t *) & gw), 
+        IPAddress((ip_addr_t *) & mask)
+    );
 }
 
 /**
  * Get the network id.
  * @return IPAddress networkID
  */
-IPAddress WiFiSTAClass::networkID()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+IPAddress WiFiSTAClass::networkID(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPAddress();
+    // }
+    // tcpip_adapter_ip_info_t ip;
+    // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
+    // return WiFiGenericClass::calculateNetworkID(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
+
+    
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-    return WiFiGenericClass::calculateNetworkID(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
+
+    ipv4 ip, gw, mask;
+    atStationIp(& ip, & gw, & mask);
+    return WiFiGenericClass::calculateNetworkID(
+        IPAddress((ip_addr_t *) & gw), 
+        IPAddress((ip_addr_t *) & mask)
+    );
 }
 
 /**
  * Get the subnet CIDR.
  * @return uint8_t subnetCIDR
  */
-uint8_t WiFiSTAClass::subnetCIDR()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+uint8_t WiFiSTAClass::subnetCIDR(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return (uint8_t)0;
+    // }
+    // tcpip_adapter_ip_info_t ip;
+    // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
+    // return WiFiGenericClass::calculateSubnetCIDR(IPAddress(ip.netmask.addr));
+
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return (uint8_t)0;
     }
-    tcpip_adapter_ip_info_t ip;
-    tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
-    return WiFiGenericClass::calculateSubnetCIDR(IPAddress(ip.netmask.addr));
+
+    ipv4 ip, gw, mask;
+    atStationIp(& ip, & gw, & mask);
+    return WiFiGenericClass::calculateSubnetCIDR(IPAddress((ip_addr_t *) & mask));
 }
 
 /**
  * Return the current SSID associated with the network
  * @return SSID
  */
-String WiFiSTAClass::SSID() const
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+String WiFiSTAClass::SSID() const {
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return String();
+    // }
+    // wifi_ap_record_t info;
+    // if(!esp_wifi_sta_get_ap_info(&info)) {
+    //     return String(reinterpret_cast<char*>(info.ssid));
+    // }
+    // return String();
+
+    WifiLinkedAp ap;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return String();
     }
-    wifi_ap_record_t info;
-    if(!esp_wifi_sta_get_ap_info(&info)) {
-        return String(reinterpret_cast<char*>(info.ssid));
+    if (atWifiConnect(& ap) == success){
+        return ap.ssid;
     }
     return String();
 }
@@ -653,40 +711,46 @@ String WiFiSTAClass::SSID() const
  * Return the current pre shared key associated with the network
  * @return  psk string
  */
-String WiFiSTAClass::psk() const
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+String WiFiSTAClass::psk() const{
+    WifiLinkedAp ap;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
+        atWifiConnect(& ap) == fail ||
+        ap.bssid.isEmpty()){
         return String();
     }
-    wifi_config_t conf;
-    esp_wifi_get_config(WIFI_IF_STA, &conf);
-    return String(reinterpret_cast<char*>(conf.sta.password));
+    return token.pwd;
 }
 
 /**
  * Return the current bssid / mac associated with the network if configured
  * @return bssid uint8_t *
  */
-uint8_t* WiFiSTAClass::BSSID(void)
-{
+uint8_t * WiFiSTAClass::BSSID(void){
     static uint8_t bssid[6];
-    wifi_ap_record_t info;
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    // wifi_ap_record_t info;
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return NULL;
+    // }
+    // if(!esp_wifi_sta_get_ap_info(&info)) {
+    //     memcpy(bssid, info.bssid, 6);
+    //     return reinterpret_cast<uint8_t*>(bssid);
+    // }
+    // return NULL;
+    WifiLinkedAp ap;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
+        atWifiConnect(& ap) == fail ||
+        ap.bssid.isEmpty()){
         return NULL;
     }
-    if(!esp_wifi_sta_get_ap_info(&info)) {
-        memcpy(bssid, info.bssid, 6);
-        return reinterpret_cast<uint8_t*>(bssid);
-    }
-    return NULL;
+    memcpy(bssid, (uint8_t *)ap.bssid, 6);
+    return bssid;
 }
 
 /**
  * Return the current bssid / mac associated with the network if configured
  * @return String bssid mac
  */
-String WiFiSTAClass::BSSIDstr(void)
-{
+String WiFiSTAClass::BSSIDstr(void){
     uint8_t* bssid = BSSID();
     if(!bssid){
         return String();
@@ -700,32 +764,45 @@ String WiFiSTAClass::BSSIDstr(void)
  * Return the current network RSSI.
  * @return  RSSI value
  */
-int8_t WiFiSTAClass::RSSI(void)
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+int8_t WiFiSTAClass::RSSI(void){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return 0;
+    // }
+    // wifi_ap_record_t info;
+    // if(!esp_wifi_sta_get_ap_info(&info)) {
+    //     return info.rssi;
+    // }
+    // return 0;
+
+    WifiLinkedAp ap;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
+        atWifiConnect(& ap) == fail ||
+        ap.bssid.isEmpty()){
         return 0;
     }
-    wifi_ap_record_t info;
-    if(!esp_wifi_sta_get_ap_info(&info)) {
-        return info.rssi;
-    }
-    return 0;
+    return ap.rssi;
 }
 
 /**
  * Get the station interface Host name.
  * @return char array hostname
  */
-const char * WiFiSTAClass::getHostname()
-{
-    const char * hostname = NULL;
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
-        return hostname;
-    }
-    if(tcpip_adapter_get_hostname(TCPIP_ADAPTER_IF_STA, &hostname)){
+const char * WiFiSTAClass::getHostname(){
+    // const char * hostname = NULL;
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return hostname;
+    // }
+    // if(tcpip_adapter_get_hostname(TCPIP_ADAPTER_IF_STA, &hostname)){
+    //     return NULL;
+    // }
+    // return hostname;
+
+    static String hostName;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
+        atStationHostName(& hostName) == fail){
         return NULL;
     }
-    return hostname;
+    return hostName.c_str();
 }
 
 /**
@@ -733,40 +810,48 @@ const char * WiFiSTAClass::getHostname()
  * @param  hostname  pointer to const string
  * @return true on   success
  */
-bool WiFiSTAClass::setHostname(const char * hostname)
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+bool WiFiSTAClass::setHostname(const char * hostname){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return false;
+    // }
+    // return tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostname) == 0;
+
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return false;
     }
-    return tcpip_adapter_set_hostname(TCPIP_ADAPTER_IF_STA, hostname) == 0;
+    return atStationHostName(hostname) == success;
 }
 
 /**
  * Enable IPv6 on the station interface.
  * @return true on success
  */
-bool WiFiSTAClass::enableIpV6()
-{
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
-        return false;
-    }
-    return tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA) == 0;
+bool WiFiSTAClass::enableIpV6(){
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return false;
+    // }
+    // return tcpip_adapter_create_ip6_linklocal(TCPIP_ADAPTER_IF_STA) == 0;
+
+    // ESP-AT NOT IMPLEMENT ---------------------------------------------------------------------------------------------------------------------------------
+    return false;
 }
 
 /**
  * Get the station interface IPv6 address.
  * @return IPv6Address
  */
-IPv6Address WiFiSTAClass::localIPv6()
-{
-    static ip6_addr_t addr;
-    if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
-        return IPv6Address();
-    }
-    if(tcpip_adapter_get_ip6_linklocal(TCPIP_ADAPTER_IF_STA, &addr)){
-        return IPv6Address();
-    }
-    return IPv6Address(addr.addr);
+IPv6Address WiFiSTAClass::localIPv6(){
+    // static ip6_addr_t addr;
+    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+    //     return IPv6Address();
+    // }
+    // if(tcpip_adapter_get_ip6_linklocal(TCPIP_ADAPTER_IF_STA, &addr)){
+    //     return IPv6Address();
+    // }
+    // return IPv6Address(addr.addr);
+
+    // ESP-AT NOT IMPLEMENT ---------------------------------------------------------------------------------------------------------------------------------
+    return false;
 }
 
 
@@ -783,18 +868,13 @@ bool WiFiSTAClass::beginSmartConfig() {
         return false;
     }
 
-    //esp_wifi_disconnect();
+    bool result;
     atWifiDisconnect();
-    atApStartSmart();
-
-    esp_err_t err;
-    err = esp_smartconfig_start(reinterpret_cast<sc_callback_t>(&WiFiSTAClass::_smartConfigCallback), 1);
-    if (err == ESP_OK) {
-        _smartConfigStarted = true;
-        _smartConfigDone = false;
-        return true;
-    }
-    return false;
+    result = atApStartSmart();
+    // TODO aynsc response event-----------------------------------------------------------------------------------------------------------------------------
+    atApStopSmart();
+    return result;
+    
     // if (_smartConfigStarted) {
     //     return false;
     // }
@@ -816,16 +896,17 @@ bool WiFiSTAClass::beginSmartConfig() {
 }
 
 bool WiFiSTAClass::stopSmartConfig() {
-    if (!_smartConfigStarted) {
-        return true;
-    }
+    // if (!_smartConfigStarted) {
+    //     return true;
+    // }
 
-    if (esp_smartconfig_stop() == ESP_OK) {
-        _smartConfigStarted = false;
-        return true;
-    }
+    // if (esp_smartconfig_stop() == ESP_OK) {
+    //     _smartConfigStarted = false;
+    //     return true;
+    // }
 
-    return false;
+    // return false;
+    return atApStopSmart() == success;
 }
 
 bool WiFiSTAClass::smartConfigDone() {

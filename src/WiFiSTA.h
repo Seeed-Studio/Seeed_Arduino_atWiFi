@@ -27,6 +27,11 @@
 #include "WiFiType.h"
 #include "WiFiGeneric.h"
 
+struct WifiToken{
+    String ssid;
+    String pwd;
+    mac    bssid;
+};
 
 class WiFiSTAClass
 {
