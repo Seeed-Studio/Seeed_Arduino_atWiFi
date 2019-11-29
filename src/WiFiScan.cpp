@@ -27,6 +27,7 @@
 #include "WiFiGeneric.h"
 #include "WiFiScan.h"
 #include "UnifiedAtWifi.h"
+#include "UnifiedAtEvent.h"
 #include <vector>
 
 extern "C" {
@@ -36,12 +37,12 @@ extern "C" {
     #include <stdlib.h>
     #include <inttypes.h>
     #include <string.h>
-    #include <esp_err.h>
-    #include <esp_wifi.h>
-    #include <esp_event_loop.h>
-    #include <esp32-hal.h>
-    #include <lwip/ip_addr.h>
-    #include "lwip/err.h"
+    // #include <esp_err.h>
+    // #include <esp_wifi.h>
+    // #include <esp_event_loop.h>
+    // #include <esp32-hal.h>
+    // #include <lwip/ip_addr.h>
+    // #include "lwip/err.h"
 }
 
 bool WiFiScanClass::_scanAsync = false;
@@ -49,8 +50,6 @@ uint32_t WiFiScanClass::_scanStarted = 0;
 uint32_t WiFiScanClass::_scanTimeout = 10000;
 uint16_t WiFiScanClass::_scanCount = 0;
 void* WiFiScanClass::_scanResult = 0;
-
-std::vector<WifiLinkInfo> scanList;
 
 /**
  * Start scan WiFi networks available
@@ -124,7 +123,7 @@ int16_t WiFiScanClass::scanNetworks(bool async, bool show_hidden, bool passive, 
         config.scan_time.active.min = 100;
         config.scan_time.active.max = max_ms_per_chan;
     }
-    if (atWifiScanAsync(scanList) == success) {
+    if (atWifiScanAsync(WiFiScanClass::_scanDone) == success) {
         _scanStarted = millis();
         if (!_scanStarted) { //Prevent 0 from millis overflow
             ++_scanStarted;
@@ -132,7 +131,7 @@ int16_t WiFiScanClass::scanNetworks(bool async, bool show_hidden, bool passive, 
         WiFiGenericClass::clearStatusBits(WIFI_SCAN_DONE_BIT);
         WiFiGenericClass::setStatusBits(WIFI_SCANNING_BIT);
 
-        if(WiFiScanClass::_scanAsync) {
+        if (WiFiScanClass::_scanAsync) {
             return WIFI_SCAN_RUNNING;
         }
         if (WiFiGenericClass::waitStatusBits(WIFI_SCAN_DONE_BIT, 10000)){
@@ -159,20 +158,20 @@ void WiFiScanClass::_scanDone(){
     // WiFiScanClass::_scanStarted=0; //Reset after a scan is completed for normal behavior
     // WiFiGenericClass::setStatusBits(WIFI_SCAN_DONE_BIT);
     // WiFiGenericClass::clearStatusBits(WIFI_SCANNING_BIT);
-
-    if(scanList.size()) {
+    
+    if(esp.wifi.apList.size()) {
         auto p = new wifi_ap_record_t[WiFiScanClass::_scanCount];
-        WiFiScanClass::_scanCount = scanList.size();
+        WiFiScanClass::_scanCount = esp.wifi.apList.size();
         WiFiScanClass::_scanResult = p;
-        for (size_t i = 0; i < scanList.size(); i++){
-            auto & t = scanList[i];
+        for (size_t i = 0; i < esp.wifi.apList.size(); i++){
+            auto & t = esp.wifi.apList[i];
             copy<uint8_t, uint8_t>(p[i].bssid, t.bssid, 6);
             copy<uint8_t, const char>(p[i].ssid, t.ssid.c_str(), t.ssid.size());
             p[i].authmode = (wifi_auth_mode_t)t.ecn;
             p[i].rssi = t.rssi;
             p[i].primary = t.channel;
         }
-        scanList.clear();
+        esp.wifi.apList.clear();
     }
     WiFiScanClass::_scanStarted=0; //Reset after a scan is completed for normal behavior
     WiFiGenericClass::setStatusBits(WIFI_SCAN_DONE_BIT);

@@ -58,7 +58,7 @@ private:
   struct{
       uint8_t * buf;
       uint32_t  length;
-  }tx, rx;
+  }tx;
 
   int32_t       linkId;
 public:

@@ -704,7 +704,7 @@ int WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
     // }
     // return (uint32_t)aResult != 0;
 
-    ipv4 ip;
+    Ipv4 ip;
     if (atGetIpByDomainName(aHostname, & ip) == success){
         aResult = IPAddress(ip);
         return true;

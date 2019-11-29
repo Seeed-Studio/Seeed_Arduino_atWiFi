@@ -16,11 +16,11 @@ constexpr int maxPacketSize = 1460;
 // {}
 
 WiFiUDP::WiFiUDP():
-    local{}, remote{}, tx{}, rx{}, linkId{} {
+    local{}, remote{}, tx{}, linkId{} {
 }
 
 WiFiUDP::~WiFiUDP(){
-   stop();
+    stop();
 }
 
 uint8_t WiFiUDP::begin(IPAddress address, uint16_t port){
@@ -59,7 +59,7 @@ uint8_t WiFiUDP::begin(IPAddress address, uint16_t port){
   // fcntl(udp_server, F_SETFL, O_NONBLOCK);
   // return 1;
 
-    ipv4 ip, gw, mask;
+    Ipv4 ip, gw, mask;
     stop();
 
     if (atIpMux(enable) == fail || 
@@ -73,11 +73,6 @@ uint8_t WiFiUDP::begin(IPAddress address, uint16_t port){
     remote.address = 0;
     remote.port = 0;
     linkId = leaveOut;
-
-    if (address) {
-        local.address = address;
-        return atStationIp(*(ipv4 *) & address) == success;
-    }
     return 1;
 }
 
@@ -102,6 +97,7 @@ uint8_t WiFiUDP::beginMulticast(IPAddress a, uint16_t p){
   //   return 1;
   // }
   // return 0;
+
     return begin(a, p);
 }
 
@@ -127,8 +123,13 @@ void WiFiUDP::stop(){
   // }
   // close(udp_server);
   // udp_server = -1;
+
     if (linkId != leaveOut){
         atIpClose(linkId);
+    }
+    if (tx.buf){
+        delete [] tx.buf;
+        tx.buf = nullptr;
     }
 }
 
@@ -172,19 +173,24 @@ int WiFiUDP::beginPacket(){
   // fcntl(udp_server, F_SETFL, O_NONBLOCK);
 
   // return 1;
+
+    if (atIpAvailableChannel(& linkId) == fail){
+        return 0;
+    }
+    if (atIpConnect(UdpConnection(remote.ip, remote.port, local.port), linkId) == fail){
+        return 0;
+    }
     if (!remote.port){
         return 0;
     }
-
     if (tx.buf == nullptr){
         tx.buf = new uint8_t[maxPacketSize];
         tx.length = 0;
     }
-
     if (tx.buf == nullptr){
         return 0;
     }
-
+    return 1;
 }
 
 int WiFiUDP::beginPacket(IPAddress ip, uint16_t port){
@@ -204,7 +210,7 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port){
   //   return 0;
   // }
   // return beginPacket(IPAddress((const uint8_t *)(server->h_addr_list[0])), port);
-    ipv4 ip;
+    Ipv4 ip;
     if (atGetIpByDomainName(host, & ip) == fail){
         return 0;
     }
@@ -222,12 +228,11 @@ int WiFiUDP::endPacket(){
   //   return 0;
   // }
   // return 1;
+
     if (tx.buf && tx.length){
         // delete tx.buf in atIpSend (param 3 is true)
         bool r = atIpSend(tx.buf, tx.length, true, linkId) == success;
-        delete [] tx.buf;
         tx.length = 0;
-        tx.buf = nullptr;
         return r;
     }
     return 0;
@@ -241,7 +246,7 @@ size_t WiFiUDP::write(uint8_t data){
   // tx_buffer[tx_buffer_len++] = data;
   // return 1;
 
-    tx_buffer[tx.length++] = data;
+    tx.buffer[tx.length++] = data;
 
     if (tx.length == maxPacketSize){
         endPacket();
@@ -249,10 +254,10 @@ size_t WiFiUDP::write(uint8_t data){
 }
 
 size_t WiFiUDP::write(const uint8_t *buffer, size_t size){
-  size_t i;
-  for(i=0;i<size;i++)
-    write(buffer[i]);
-  return i;
+    size_t i;
+    for(i=0;i<size;i++)
+        write(buffer[i]);
+    return i;
 }
 
 int WiFiUDP::parsePacket(){
@@ -280,13 +285,17 @@ int WiFiUDP::parsePacket(){
   // }
   // delete[] buf;
   // return len;
-    
+
+    return available();
 }
 
 int WiFiUDP::available(){
   // if(!rx_buffer) return 0;
   // return rx_buffer->available();
 
+    int32_t size;
+    atIpAvailable(& size, linkId);
+    return size;
 }
 
 int WiFiUDP::read(){
@@ -298,7 +307,12 @@ int WiFiUDP::read(){
   //   delete b;
   // }
   // return out;
-    
+    if (available() == 0){
+        return -1;
+    }
+    uint8_t buffer;
+    atIpReceive(& buffer, 1, nullptr, linkId))
+    return buffer;
 }
 
 int WiFiUDP::read(unsigned char* buffer, size_t len){
@@ -306,26 +320,34 @@ int WiFiUDP::read(unsigned char* buffer, size_t len){
 }
 
 int WiFiUDP::read(char* buffer, size_t len){
-  if(!rx_buffer) return 0;
-  int out = rx_buffer->read(buffer, len);
-  if(!rx_buffer->available()){
-    cbuf *b = rx_buffer;
-    rx_buffer = 0;
-    delete b;
-  }
-  return out;
+  // if(!rx_buffer) return 0;
+  // int out = rx_buffer->read(buffer, len);
+  // if(!rx_buffer->available()){
+  //   cbuf *b = rx_buffer;
+  //   rx_buffer = 0;
+  //   delete b;
+  // }
+  // return out;
+    int32_t length;
+    atIpReceive(& buffer, len, & length, linkId))
+    return length;
 }
 
 int WiFiUDP::peek(){
-  if(!rx_buffer) return -1;
-  return rx_buffer->peek();
+  // if(!rx_buffer) return -1;
+  // return rx_buffer->peek();
+    int32_t value;
+    atIpPeek(& value, linkId);
+    return value;
 }
 
 void WiFiUDP::flush(){
-  if(!rx_buffer) return;
-  cbuf *b = rx_buffer;
-  rx_buffer = 0;
-  delete b;
+  // if(!rx_buffer) return;
+  // cbuf *b = rx_buffer;
+  // rx_buffer = 0;
+  // delete b;
+
+    packetBuffers[linkId].~UnifiedRingBuffer();
 }
 
 IPAddress WiFiUDP::remoteIP(){

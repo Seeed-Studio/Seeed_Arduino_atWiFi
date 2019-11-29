@@ -399,12 +399,12 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
         return false;
     }
 
-    ipv4 ip, gw, mask;
+    Ipv4 ip, gw, mask;
     
     if (local_ip != (uint32_t)0x00000000){
-        ip   = *(ipv4 *)(& local_ip);
-        gw   = *(ipv4 *)(& gateway);
-        mask = *(ipv4 *)(& subnet);
+        ip   = *(Ipv4 *)(& local_ip);
+        gw   = *(Ipv4 *)(& gateway);
+        mask = *(Ipv4 *)(& subnet);
     }
     if (atDhcp(disable, 1 << TCPIP_ADAPTER_IF_STA) == fail){
         log_e("DHCP could not be stopped! Error: %d", err);
@@ -427,7 +427,7 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
         _useStaticIp = false;
     }
 
-    return atDns(enable, *(ipv4 *)& dns1, *(ipv4 *)& dns2) == success;
+    return atDns(enable, *(Ipv4 *)& dns1, *(Ipv4 *)& dns2) == success;
 }
 
 /**
@@ -501,7 +501,7 @@ IPAddress WiFiSTAClass::localIP(){
     // tcpip_adapter_ip_info_t ip;
     // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
     // return IPAddress(ip.ip.addr);
-    ipv4 ip;
+    Ipv4 ip;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
@@ -568,7 +568,7 @@ IPAddress WiFiSTAClass::subnetMask(){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    ipv4 ip;
+    Ipv4 ip;
     atStationIp(& ip);
     return IPAddress((ip_addr_t *) & ip);
 }
@@ -588,7 +588,7 @@ IPAddress WiFiSTAClass::gatewayIP(){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    ipv4 ip, gw;
+    Ipv4 ip, gw;
     atStationIp(& ip, & gw);
     return IPAddress((ip_addr_t *) & gw);
 }
@@ -608,7 +608,7 @@ IPAddress WiFiSTAClass::dnsIP(uint8_t dns_no){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    ipv4 dns[2];
+    Ipv4 dns[2];
     atDns(dns, dns + 1);
     return IPAddress((ip_addr_t *)dns + dns_no);
 }
@@ -629,7 +629,7 @@ IPAddress WiFiSTAClass::broadcastIP(){
         return IPAddress();
     }
 
-    ipv4 ip, gw, mask;
+    Ipv4 ip, gw, mask;
     atStationIp(& ip, & gw, & mask);
     return WiFiGenericClass::calculateBroadcast(
         IPAddress((ip_addr_t *) & gw), 
@@ -654,7 +654,7 @@ IPAddress WiFiSTAClass::networkID(){
         return IPAddress();
     }
 
-    ipv4 ip, gw, mask;
+    Ipv4 ip, gw, mask;
     atStationIp(& ip, & gw, & mask);
     return WiFiGenericClass::calculateNetworkID(
         IPAddress((ip_addr_t *) & gw), 
@@ -678,7 +678,7 @@ uint8_t WiFiSTAClass::subnetCIDR(){
         return (uint8_t)0;
     }
 
-    ipv4 ip, gw, mask;
+    Ipv4 ip, gw, mask;
     atStationIp(& ip, & gw, & mask);
     return WiFiGenericClass::calculateSubnetCIDR(IPAddress((ip_addr_t *) & mask));
 }

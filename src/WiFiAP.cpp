@@ -189,7 +189,7 @@ bool WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress 
         return false;
     }
 
-    if (atApIp(*(ipv4 *)(& local_ip), *(ipv4 *)(& gateway), *(ipv4 *)(& subnet)) == fail){
+    if (atApIp(*(Ipv4 *)(& local_ip), *(Ipv4 *)(& gateway), *(Ipv4 *)(& subnet)) == fail){
         return false;
     }
 
@@ -201,8 +201,8 @@ bool WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress 
     uint32_t start = local_ip + (1 << 24);
     uint32_t end = local_ip + (11 << 24);
     atDhcpIpRange(& range);
-    range.startIp = *(ipv4 *) & start;
-    range.endIp = *(ipv4 *) & end;
+    range.startIp = *(Ipv4 *) & start;
+    range.endIp = *(Ipv4 *) & end;
 
     if (atDhcpIpRange(range) == fail){
         return false;
@@ -286,7 +286,7 @@ IPAddress WiFiAPClass::softAPIP(){
     // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
     // return IPAddress(ip.ip.addr);
 
-    ipv4 ip;
+    Ipv4 ip;
     
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip) == fail){
         return IPAddress();
@@ -295,9 +295,9 @@ IPAddress WiFiAPClass::softAPIP(){
 }
 
 IPAddress softApIp(IPAddress (* call)(IPAddress, IPAddress)){
-    ipv4 ip;
-    ipv4 gw;
-    ipv4 mask;
+    Ipv4 ip;
+    Ipv4 gw;
+    Ipv4 mask;
 
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip, & gw, & mask) == fail){
         return IPAddress();
