@@ -21,7 +21,7 @@
  Reworked on 28 Dec 2015 by Markus Sattler
 
  */
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #include "UnifiedAtWifi.h"
 
 extern "C" {

@@ -3,7 +3,7 @@
  *
  */
 
-#include <WiFi.h>
+#include "Seeed_Arduino_atWiFi.h"
 #include <WiFiMulti.h>
 
 WiFiMulti WiFiMulti;

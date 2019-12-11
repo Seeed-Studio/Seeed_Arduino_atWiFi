@@ -19,8 +19,8 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef WiFi_h
-#define WiFi_h
+#ifndef Seeed_Arduino_atWiFi_h
+#define Seeed_Arduino_atWiFi_h
 
 #include <stdint.h>
 
@@ -64,4 +64,4 @@ public:
 
 extern WiFiClass WiFi;
 
-#endif
+#endif//Seeed_Arduino_atWiFi_h

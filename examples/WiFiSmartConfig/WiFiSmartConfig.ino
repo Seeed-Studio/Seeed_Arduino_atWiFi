@@ -1,4 +1,4 @@
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 
 void setup() {
   Serial.begin(115200);

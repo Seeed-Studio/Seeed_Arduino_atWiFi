@@ -14,7 +14,7 @@ Author:
 Pranav Cherukupalli <cherukupallip@gmail.com>
 */
 
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #include "esp_wps.h"
 /*
 Change the definition of the WPS mode

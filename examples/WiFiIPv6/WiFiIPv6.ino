@@ -1,4 +1,4 @@
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 
 #define STA_SSID "**********"
 #define STA_PASS "**********"

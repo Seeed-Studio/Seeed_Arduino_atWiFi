@@ -15,7 +15,7 @@
 // Sketch shows how to switch between WiFi and BlueTooth or use both
 // Button is attached between GPIO 0 and GND and modes are switched with each press
 
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #define STA_SSID "your-ssid"
 #define STA_PASS "your-pass"
 #define AP_SSID  "esp32"

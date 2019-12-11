@@ -6,7 +6,7 @@
  *
  */
 
-#include <WiFi.h>
+#include "Seeed_Arduino_atWiFi.h"
 
 const char* ssid     = "your-ssid";
 const char* password = "your-password";

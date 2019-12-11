@@ -25,7 +25,7 @@ ported for sparkfun esp32
  
  */
 
-#include <WiFi.h>
+#include "Seeed_Arduino_atWiFi.h"
 
 const char* ssid     = "yourssid";
 const char* password = "yourpasswd";
