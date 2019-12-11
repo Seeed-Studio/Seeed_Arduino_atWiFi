@@ -127,9 +127,9 @@ void WiFiUDP::stop(){
     if (linkId != leaveOut){
         atIpClose(linkId);
     }
-    if (tx.buf){
-        delete [] tx.buf;
-        tx.buf = nullptr;
+    if (tx.buffer){
+        delete [] tx.buffer;
+        tx.buffer = nullptr;
     }
 }
 
@@ -183,11 +183,11 @@ int WiFiUDP::beginPacket(){
     if (!remote.port){
         return 0;
     }
-    if (tx.buf == nullptr){
-        tx.buf = new uint8_t[maxPacketSize];
+    if (tx.buffer == nullptr){
+        tx.buffer = new uint8_t[maxPacketSize];
         tx.length = 0;
     }
-    if (tx.buf == nullptr){
+    if (tx.buffer == nullptr){
         return 0;
     }
     return 1;
@@ -229,9 +229,9 @@ int WiFiUDP::endPacket(){
   // }
   // return 1;
 
-    if (tx.buf && tx.length){
-        // delete tx.buf in atIpSend (param 3 is true)
-        bool r = atIpSend(tx.buf, tx.length, true, linkId) == Success;
+    if (tx.buffer && tx.length){
+        // delete tx.buffer in atIpSend (param 3 is true)
+        bool r = atIpSend(tx.buffer, tx.length, true, linkId) == Success;
         tx.length = 0;
         return r;
     }

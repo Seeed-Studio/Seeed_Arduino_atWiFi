@@ -35,6 +35,7 @@
 #ifndef _WIFIUDP_H_
 #define _WIFIUDP_H_
 
+#include "UnifiedAtType.h"
 #include <Arduino.h>
 #include <Udp.h>
 // #include <cbuf.h>
@@ -56,7 +57,7 @@ private:
   }local, remote;
 
   struct{
-      uint8_t * buf;
+      uint8_t * buffer;
       uint32_t  length;
   }tx;
 
