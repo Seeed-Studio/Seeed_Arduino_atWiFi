@@ -58,7 +58,7 @@ static wl_status_t wifiBegin(bool _useStaticIp, bool connect){
     bool result;
 
     if (!_useStaticIp) {
-        if (atDhcp(enable, 1 << TCPIP_ADAPTER_IF_STA) == fail){
+        if (atDhcp(enable, 1 << TCPIP_ADAPTER_IF_STA) == Fail){
             log_e("dhcp client start failed!");
             return WL_CONNECT_FAILED;
         }
@@ -73,7 +73,7 @@ static wl_status_t wifiBegin(bool _useStaticIp, bool connect){
 
     result = atWifiConnect(token.ssid, token.pwd, token.bssid);
 
-    if (result == fail){
+    if (result == Fail){
         log_e("connect failed!");
         return WL_CONNECT_FAILED;
     }
@@ -203,7 +203,7 @@ wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_
     atWifiConnect(& ap);
 
     if (!ap.bssid.isEmpty() && strncmp((char *)& ap.bssid, (char *)bssid, 6) != 0){
-        if (atWifiDisconnect() == fail){
+        if (atWifiDisconnect() == Fail){
             log_e("disconnect failed!");
             return WL_CONNECT_FAILED;
         }
@@ -275,10 +275,10 @@ bool WiFiSTAClass::reconnect() {
     // return false;
 
     if (Wifi.getMode() & WIFI_MODE_STA){
-        if (atWifiDisconnect() == fail){
+        if (atWifiDisconnect() == Fail){
             return false;
         }
-        return atWifiConnect(token.ssid, token.pwd, token.bssid) == success;
+        return atWifiConnect(token.ssid, token.pwd, token.bssid) == Success;
     }
     return false;
 }
@@ -295,7 +295,7 @@ bool WiFiSTAClass::disconnect(bool wifioff, bool eraseap) {
     if (eraseap){
         //TODO
     }
-    if (atWifiDisconnect() == fail){
+    if (atWifiDisconnect() == Fail){
         return false;
     }
     if (wifioff){
@@ -406,12 +406,12 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
         gw   = *(Ipv4 *)(& gateway);
         mask = *(Ipv4 *)(& subnet);
     }
-    if (atDhcp(disable, 1 << TCPIP_ADAPTER_IF_STA) == fail){
+    if (atDhcp(disable, 1 << TCPIP_ADAPTER_IF_STA) == Fail){
         log_e("DHCP could not be stopped! Error: %d", err);
         return false;
     }
 
-    if (atStationIp(ip, gw, mask) == fail){
+    if (atStationIp(ip, gw, mask) == Fail){
         log_e("STA IP could not be configured! Error: %d", err);
         return false;
     }
@@ -420,14 +420,14 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
         _useStaticIp = true;
     } 
     else {
-        if(atDhcp(enable, 1 << TCPIP_ADAPTER_IF_STA) == fail){
+        if(atDhcp(enable, 1 << TCPIP_ADAPTER_IF_STA) == Fail){
             log_e("dhcp client start failed!");
             return false;
         }
         _useStaticIp = false;
     }
 
-    return atDns(enable, *(Ipv4 *)& dns1, *(Ipv4 *)& dns2) == success;
+    return atDns(enable, *(Ipv4 *)& dns1, *(Ipv4 *)& dns2) == Success;
 }
 
 /**
@@ -505,7 +505,7 @@ IPAddress WiFiSTAClass::localIP(){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
-    if (atStationIp(& ip) == fail){
+    if (atStationIp(& ip) == Fail){
         return false;
     }
     return IPAddress((ip_addr_t *) & ip);
@@ -701,7 +701,7 @@ String WiFiSTAClass::SSID() const {
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return String();
     }
-    if (atWifiConnect(& ap) == success){
+    if (atWifiConnect(& ap) == Success){
         return ap.ssid;
     }
     return String();
@@ -714,7 +714,7 @@ String WiFiSTAClass::SSID() const {
 String WiFiSTAClass::psk() const{
     WifiLinkedAp ap;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
-        atWifiConnect(& ap) == fail ||
+        atWifiConnect(& ap) == Fail ||
         ap.bssid.isEmpty()){
         return String();
     }
@@ -738,7 +738,7 @@ uint8_t * WiFiSTAClass::BSSID(void){
     // return NULL;
     WifiLinkedAp ap;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
-        atWifiConnect(& ap) == fail ||
+        atWifiConnect(& ap) == Fail ||
         ap.bssid.isEmpty()){
         return NULL;
     }
@@ -776,7 +776,7 @@ int8_t WiFiSTAClass::RSSI(void){
 
     WifiLinkedAp ap;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
-        atWifiConnect(& ap) == fail ||
+        atWifiConnect(& ap) == Fail ||
         ap.bssid.isEmpty()){
         return 0;
     }
@@ -799,7 +799,7 @@ const char * WiFiSTAClass::getHostname(){
 
     static String hostName;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
-        atStationHostName(& hostName) == fail){
+        atStationHostName(& hostName) == Fail){
         return NULL;
     }
     return hostName.c_str();
@@ -808,7 +808,7 @@ const char * WiFiSTAClass::getHostname(){
 /**
  * Set the station interface Host name.
  * @param  hostname  pointer to const string
- * @return true on   success
+ * @return true on   Success
  */
 bool WiFiSTAClass::setHostname(const char * hostname){
     // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
@@ -819,12 +819,12 @@ bool WiFiSTAClass::setHostname(const char * hostname){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return false;
     }
-    return atStationHostName(hostname) == success;
+    return atStationHostName(Text(hostname)) == Success;
 }
 
 /**
  * Enable IPv6 on the station interface.
- * @return true on success
+ * @return true on Success
  */
 bool WiFiSTAClass::enableIpV6(){
     // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
@@ -906,7 +906,7 @@ bool WiFiSTAClass::stopSmartConfig() {
     // }
 
     // return false;
-    return atApStopSmart() == success;
+    return atApStopSmart() == Success;
 }
 
 bool WiFiSTAClass::smartConfigDone() {

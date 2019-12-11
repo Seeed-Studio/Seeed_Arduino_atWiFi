@@ -26,7 +26,6 @@
 #include "WiFiMulti.h"
 #include <limits.h>
 #include <string.h>
-#include <esp32-hal.h>
 
 WiFiMulti::WiFiMulti()
 {

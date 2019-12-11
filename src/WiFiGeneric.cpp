@@ -492,7 +492,7 @@ bool WiFiGenericClass::mode(wifi_mode_t m){
     //     return false;
     // }
     // return true;
-    return atWifiMode(int32_t(m)) == success;
+    return atWifiMode(int32_t(m)) == Success;
 }
 
 /**
@@ -511,7 +511,7 @@ wifi_mode_t WiFiGenericClass::getMode(){
     // return mode;
 
     int32_t mode;
-    if (atWifiMode(& mode) == fail){
+    if (atWifiMode(& mode) == Fail){
         return WIFI_MODE_NULL;
     }
     return wifi_mode_t(mode);
@@ -571,7 +571,7 @@ bool WiFiGenericClass::setSleep(bool enable){
         log_w("STA has not been started");
         return false;
     }
-    return atSleepMode(enable) == success;
+    return atSleepMode(enable) == Success;
 }
 
 /**
@@ -593,7 +593,7 @@ bool WiFiGenericClass::getSleep(){
         log_w("STA has not been started");
         return false;
     }
-    if(atSleepMode(& mode) == success){
+    if(atSleepMode(& mode) == Success){
         return wifi_ps_type_t(mode) == WIFI_PS_MIN_MODEM;
     }
     return false;
@@ -626,7 +626,7 @@ bool WiFiGenericClass::setTxPower(wifi_power_t power){
     case WIFI_POWER_2dBm:       pwr.wifiPower = 10; break;
     case WIFI_POWER_MINUS_1dBm: pwr.wifiPower = 11; break;
     }
-    return atRfPower(pwr) == success;
+    return atRfPower(pwr) == Success;
 }
 
 wifi_power_t WiFiGenericClass::getTxPower(){
@@ -656,7 +656,7 @@ wifi_power_t WiFiGenericClass::getTxPower(){
         WIFI_POWER_MINUS_1dBm
     };
 
-    if (atRfPower(& pwr) == success){
+    if (atRfPower(& pwr) == Success){
         return map[pwr.wifiPower];
     }
     return WIFI_POWER_19_5dBm;
@@ -705,7 +705,7 @@ int WiFiGenericClass::hostByName(const char* aHostname, IPAddress& aResult) {
     // return (uint32_t)aResult != 0;
 
     Ipv4 ip;
-    if (atGetIpByDomainName(aHostname, & ip) == success){
+    if (atGetIpByDomainName(aHostname, & ip) == Success){
         aResult = IPAddress(ip);
         return true;
     }

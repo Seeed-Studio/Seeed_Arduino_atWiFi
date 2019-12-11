@@ -75,13 +75,13 @@ bool WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, 
     // }
 
     // if(!ssid || *ssid == 0) {
-    //     // fail SSID missing
+    //     // Fail SSID missing
     //     log_e("SSID missing!");
     //     return false;
     // }
 
     // if(passphrase && (strlen(passphrase) > 0 && strlen(passphrase) < 8)) {
-    //     // fail passphrase too short
+    //     // Fail passphrase too short
     //     log_e("passphrase too short!");
     //     return false;
     // }
@@ -119,13 +119,13 @@ bool WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, 
     }
 
     if (!ssid || *ssid == 0) {
-        // fail SSID missing
+        // Fail SSID missing
         log_e("SSID missing!");
         return false;
     }
 
     if (passphrase && (strlen(passphrase) > 0 && strlen(passphrase) < 8)) {
-        // fail passphrase too short
+        // Fail passphrase too short
         log_e("passphrase too short!");
         return false;
     }
@@ -144,7 +144,7 @@ bool WiFiAPClass::softAP(const char* ssid, const char* passphrase, int channel, 
         config.pwd = passphrase;
         config.ecn = WIFI_AUTH_WPA2_PSK;
     }
-    return atWifiApConfigure(config) == success;
+    return atWifiApConfigure(config) == Success;
 }
 
 
@@ -189,11 +189,11 @@ bool WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress 
         return false;
     }
 
-    if (atApIp(*(Ipv4 *)(& local_ip), *(Ipv4 *)(& gateway), *(Ipv4 *)(& subnet)) == fail){
+    if (atApIp(*(Ipv4 *)(& local_ip), *(Ipv4 *)(& gateway), *(Ipv4 *)(& subnet)) == Fail){
         return false;
     }
 
-    if (atDhcp(disable, 1 << TCPIP_ADAPTER_IF_AP) == fail){
+    if (atDhcp(disable, 1 << TCPIP_ADAPTER_IF_AP) == Fail){
         return false;
     }
 
@@ -204,10 +204,10 @@ bool WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress 
     range.startIp = *(Ipv4 *) & start;
     range.endIp = *(Ipv4 *) & end;
 
-    if (atDhcpIpRange(range) == fail){
+    if (atDhcpIpRange(range) == Fail){
         return false;
     }
-    return atDhcp(enable, 1 << TCPIP_ADAPTER_IF_AP) == success;
+    return atDhcp(enable, 1 << TCPIP_ADAPTER_IF_AP) == Success;
 }
 
 
@@ -245,7 +245,7 @@ bool WiFiAPClass::softAPdisconnect(bool wifioff){
     config.ssid = "";
     config.pwd = "";
     config.ecn = WIFI_AUTH_OPEN;
-    if (atWifiApConfigure(config) == fail){
+    if (atWifiApConfigure(config) == Fail){
         return false;
     }
 
@@ -267,8 +267,8 @@ uint8_t WiFiAPClass::softAPgetStationNum(){
     // }
     // return 0;
 
-    std::vector<WifiUser> list;
-    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atWifiUser(list) == fail){
+    Array<WifiUser> list;
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atWifiUser(& list) == Fail){
         return 0;
     }
     return list.size();
@@ -288,7 +288,7 @@ IPAddress WiFiAPClass::softAPIP(){
 
     Ipv4 ip;
     
-    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip) == fail){
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip) == Fail){
         return IPAddress();
     }
     return IPAddress((ip_addr_t *) & ip);
@@ -299,7 +299,7 @@ IPAddress softApIp(IPAddress (* call)(IPAddress, IPAddress)){
     Ipv4 gw;
     Ipv4 mask;
 
-    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip, & gw, & mask) == fail){
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip, & gw, & mask) == Fail){
         return IPAddress();
     }
     return call(
@@ -415,7 +415,7 @@ const char * WiFiAPClass::softAPgetHostname(){
     WifiApConfigure config;
     
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || 
-        atWifiApConfigure(& config) == fail){
+        atWifiApConfigure(& config) == Fail){
         return NULL;
     }
     hostname = config.ssid;
@@ -425,7 +425,7 @@ const char * WiFiAPClass::softAPgetHostname(){
 /**
  * Set the softAP    interface Host name.
  * @param  hostname  pointer to const string
- * @return true on   success
+ * @return true on   Success
  */
 bool WiFiAPClass::softAPsetHostname(const char * hostname){
     // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
@@ -435,16 +435,16 @@ bool WiFiAPClass::softAPsetHostname(const char * hostname){
 
     WifiApConfigure config;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || 
-        atWifiApConfigure(& config) == fail){
+        atWifiApConfigure(& config) == Fail){
         return false;
     }
     config.ssid = hostname;
-    return atWifiApConfigure(config) == success;
+    return atWifiApConfigure(config) == Success;
 }
 
 /**
  * Enable IPv6 on the softAP interface.
- * @return true on success
+ * @return true on Success
  */
 bool WiFiAPClass::softAPenableIpV6(){
     // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){

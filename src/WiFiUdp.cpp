@@ -62,8 +62,8 @@ uint8_t WiFiUDP::begin(IPAddress address, uint16_t port){
     Ipv4 ip, gw, mask;
     stop();
 
-    if (atIpMux(enable) == fail || 
-        atStationIp(& ip, & gw, & mask) == fail){
+    if (atIpMux(enable) == Fail ||
+        atStationIp(& ip, & gw, & mask) == Fail){
         return 0;
     }
 
@@ -174,10 +174,10 @@ int WiFiUDP::beginPacket(){
 
   // return 1;
 
-    if (atIpAvailableChannel(& linkId) == fail){
+    if (atIpAvailableChannel(& linkId) == Fail){
         return 0;
     }
-    if (atIpConnect(UdpConnection(remote.ip, remote.port, local.port), linkId) == fail){
+    if (atIpConnect(UdpConnection(remote.ip, remote.port, local.port), linkId) == Fail){
         return 0;
     }
     if (!remote.port){
@@ -211,7 +211,7 @@ int WiFiUDP::beginPacket(const char *host, uint16_t port){
   // }
   // return beginPacket(IPAddress((const uint8_t *)(server->h_addr_list[0])), port);
     Ipv4 ip;
-    if (atGetIpByDomainName(host, & ip) == fail){
+    if (atGetIpByDomainName(host, & ip) == Fail){
         return 0;
     }
     return beginPacket(IPAddress(ip), port);
@@ -231,7 +231,7 @@ int WiFiUDP::endPacket(){
 
     if (tx.buf && tx.length){
         // delete tx.buf in atIpSend (param 3 is true)
-        bool r = atIpSend(tx.buf, tx.length, true, linkId) == success;
+        bool r = atIpSend(tx.buf, tx.length, true, linkId) == Success;
         tx.length = 0;
         return r;
     }
