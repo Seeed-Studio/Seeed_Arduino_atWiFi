@@ -1,4 +1,4 @@
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #include "WiFiGeneric.h"
 #include "WiFiAP.h"
 #include "UnifiedAtWifi.h"
@@ -291,7 +291,7 @@ IPAddress WiFiAPClass::softAPIP(){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || atApIp(& ip) == Fail){
         return IPAddress();
     }
-    return IPAddress((ip_addr_t *) & ip);
+    return IPAddress(ip);
 }
 
 IPAddress softApIp(IPAddress (* call)(IPAddress, IPAddress)){
@@ -303,8 +303,8 @@ IPAddress softApIp(IPAddress (* call)(IPAddress, IPAddress)){
         return IPAddress();
     }
     return call(
-        IPAddress((ip_addr_t *) & gw), 
-        IPAddress((ip_addr_t *) & mask)
+        IPAddress(gw),
+        IPAddress(mask)
     );
 }
 
@@ -324,7 +324,7 @@ IPAddress WiFiAPClass::softAPBroadcastIP(){
     // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
     // return WiFiGenericClass::calculateBroadcast(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
 
-    return softAp(& WiFiGenericClass::calculateBroadcast);
+    return softApIp(& WiFiGenericClass::calculateBroadcast);
 }
 
 /**
@@ -339,7 +339,7 @@ IPAddress WiFiAPClass::softAPNetworkID(){
     // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
     // return WiFiGenericClass::calculateNetworkID(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
 
-    return softAp(& WiFiGenericClass::calculateNetworkID);
+    return softApIp(& WiFiGenericClass::calculateNetworkID);
 }
 
 /**
@@ -353,7 +353,7 @@ uint8_t WiFiAPClass::softAPSubnetCIDR(){
     // }
     // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_AP, &ip);
     // return WiFiGenericClass::calculateSubnetCIDR(IPAddress(ip.netmask.addr));
-    return softAp(& softApCIDR);
+    return softApIp(& softApCIDR);
 }
 
 /**
@@ -368,7 +368,9 @@ uint8_t* WiFiAPClass::softAPmacAddress(uint8_t* bssid){
     // return mac;
 
     if (WiFiGenericClass::getMode() != WIFI_MODE_NULL){
-        atApMac((mac *)bssid);
+        Mac mac;
+        atApMac(& mac);
+        copy<uint8_t, uint8_t>(bssid, mac, 6);
     }
     return bssid;
 }
@@ -392,7 +394,9 @@ String WiFiAPClass::softAPmacAddress(void){
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return String();
     }
-    atApMac((mac *)bssid);
+    Mac mac;
+    atApMac(& mac);
+    copy<uint8_t, uint8_t>(bssid, mac, 6);
     sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
     return String(macStr);
 }
@@ -411,7 +415,7 @@ const char * WiFiAPClass::softAPgetHostname(){
     // }
     // return hostname;
 
-    static String hostname;
+    static Text hostname;
     WifiApConfigure config;
     
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL || 
@@ -474,5 +478,5 @@ IPv6Address WiFiAPClass::softAPIPv6(){
     // return IPv6Address(addr.addr);
 
     // ESP-AT NOT IMPLEMENT ---------------------------------------------------------------------------------------------------------------------------------
-    return false;
+    return IPv6Address();
 }

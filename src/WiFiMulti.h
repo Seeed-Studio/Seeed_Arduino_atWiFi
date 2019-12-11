@@ -26,7 +26,7 @@
 #ifndef WIFICLIENTMULTI_H_
 #define WIFICLIENTMULTI_H_
 
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #include <vector>
 
 typedef struct {

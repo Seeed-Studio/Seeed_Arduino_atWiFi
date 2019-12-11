@@ -26,7 +26,6 @@
 
 #include "Print.h"
 #include "IPAddress.h"
-#include "IPv6Address.h"
 
 #include "WiFiType.h"
 #include "WiFiSTA.h"
@@ -34,8 +33,6 @@
 #include "WiFiScan.h"
 #include "WiFiGeneric.h"
 
-#include "WiFiClient.h"
-#include "WiFiServer.h"
 #include "WiFiUdp.h"
 
 class WiFiClass : public WiFiGenericClass, public WiFiSTAClass, public WiFiScanClass, public WiFiAPClass

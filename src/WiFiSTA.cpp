@@ -1,8 +1,9 @@
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #include "WiFiGeneric.h"
 #include "WiFiSTA.h"
 #include "UnifiedAtWifi.h"
 #include "UnifiedAtTcpIp.h"
+#include "Seeed_Arduino_FreeRTOS.h"
 
 extern "C" {
 #include <stdint.h>
@@ -130,7 +131,7 @@ wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_
     //     log_e("passphrase too long!");
     //     return WL_CONNECT_FAILED;
     // }
-    
+
     // wifi_config_t conf;
     // memset(&conf, 0, sizeof(wifi_config_t));
     // strcpy(reinterpret_cast<char*>(conf.sta.ssid), ssid);
@@ -198,11 +199,11 @@ wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_
         log_e("passphrase too long!");
         return WL_CONNECT_FAILED;
     }
-    
+
     WifiLinkedAp ap;
     atWifiConnect(& ap);
 
-    if (!ap.bssid.isEmpty() && strncmp((char *)& ap.bssid, (char *)bssid, 6) != 0){
+    if (!ap.bssid.isNull && strncmp((char *)ap.bssid, (char *)bssid, 6) != 0){
         if (atWifiDisconnect() == Fail){
             log_e("disconnect failed!");
             return WL_CONNECT_FAILED;
@@ -214,7 +215,9 @@ wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_
 
     token.ssid = ssid;
     token.pwd = passphrase;
-    token.bssid = bssid ? *(mac *)bssid : mac(); // mac() for set a empty mac 
+    if (bssid){
+        token.bssid = Mac(bssid);
+    }
     return status();
 }
 
@@ -274,7 +277,7 @@ bool WiFiSTAClass::reconnect() {
     // }
     // return false;
 
-    if (Wifi.getMode() & WIFI_MODE_STA){
+    if (WiFi.getMode() & WIFI_MODE_STA){
         if (atWifiDisconnect() == Fail){
             return false;
         }
@@ -308,7 +311,7 @@ bool WiFiSTAClass::disconnect(bool wifioff, bool eraseap) {
     // if(WiFi.getMode() & WIFI_MODE_STA){
     //     if(eraseap){
     //         memset(&conf, 0, sizeof(wifi_config_t));
-            
+
     //         if(esp_wifi_set_config(WIFI_IF_STA, &conf)){
     //             log_e("clear config failed!");
     //         }
@@ -352,7 +355,7 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
     //     info.gw.addr = 0;
     //     info.netmask.addr = 0;
     // }
-    
+
     // err = tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
     // if(err != ESP_OK && err != ESP_ERR_TCPIP_ADAPTER_DHCP_ALREADY_STOPPED){
     //     log_e("DHCP could not be stopped! Error: %d", err);
@@ -400,7 +403,7 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
     }
 
     Ipv4 ip, gw, mask;
-    
+
     if (local_ip != (uint32_t)0x00000000){
         ip   = *(Ipv4 *)(& local_ip);
         gw   = *(Ipv4 *)(& gateway);
@@ -416,9 +419,9 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
         return false;
     }
 
-    if (!ip.isEmpty()){
+    if (!ip.isNull){
         _useStaticIp = true;
-    } 
+    }
     else {
         if(atDhcp(enable, 1 << TCPIP_ADAPTER_IF_STA) == Fail){
             log_e("dhcp client start failed!");
@@ -427,7 +430,7 @@ bool WiFiSTAClass::config(IPAddress local_ip, IPAddress gateway, IPAddress subne
         _useStaticIp = false;
     }
 
-    return atDns(enable, *(Ipv4 *)& dns1, *(Ipv4 *)& dns2) == Success;
+    return atDns(enable, Ipv4(dns1), Ipv4(dns2)) == Success;
 }
 
 /**
@@ -506,9 +509,9 @@ IPAddress WiFiSTAClass::localIP(){
         return IPAddress();
     }
     if (atStationIp(& ip) == Fail){
-        return false;
+        return IPAddress();
     }
-    return IPAddress((ip_addr_t *) & ip);
+    return IPAddress(ip);
 }
 
 
@@ -525,8 +528,9 @@ uint8_t* WiFiSTAClass::macAddress(uint8_t* bssid){
     //     esp_read_mac(mac, ESP_MAC_WIFI_STA);
     // }
     // return mac;
-    
-    atStationMac((mac *)bssid);
+    Mac mac;
+    atStationMac(mac);
+    copy<uint8_t, uint8_t>(bssid, mac, 6);
     return bssid;
 }
 
@@ -546,7 +550,7 @@ String WiFiSTAClass::macAddress(void){
     // sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
     // return String(macStr);
 
-    mac  bssid;
+    Mac  bssid;
     char macStr[18] = { 0 };
     atStationMac(& bssid);
     sprintf(macStr, "%02X:%02X:%02X:%02X:%02X:%02X", bssid[0], bssid[1], bssid[2], bssid[3], bssid[4], bssid[5]);
@@ -570,7 +574,7 @@ IPAddress WiFiSTAClass::subnetMask(){
     }
     Ipv4 ip;
     atStationIp(& ip);
-    return IPAddress((ip_addr_t *) & ip);
+    return IPAddress(ip);
 }
 
 /**
@@ -590,7 +594,7 @@ IPAddress WiFiSTAClass::gatewayIP(){
     }
     Ipv4 ip, gw;
     atStationIp(& ip, & gw);
-    return IPAddress((ip_addr_t *) & gw);
+    return IPAddress(gw);
 }
 
 /**
@@ -610,7 +614,7 @@ IPAddress WiFiSTAClass::dnsIP(uint8_t dns_no){
     }
     Ipv4 dns[2];
     atDns(dns, dns + 1);
-    return IPAddress((ip_addr_t *)dns + dns_no);
+    return IPAddress(dns[dns_no]);
 }
 
 /**
@@ -632,8 +636,8 @@ IPAddress WiFiSTAClass::broadcastIP(){
     Ipv4 ip, gw, mask;
     atStationIp(& ip, & gw, & mask);
     return WiFiGenericClass::calculateBroadcast(
-        IPAddress((ip_addr_t *) & gw), 
-        IPAddress((ip_addr_t *) & mask)
+        IPAddress(gw),
+        IPAddress(mask)
     );
 }
 
@@ -649,7 +653,6 @@ IPAddress WiFiSTAClass::networkID(){
     // tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip);
     // return WiFiGenericClass::calculateNetworkID(IPAddress(ip.gw.addr), IPAddress(ip.netmask.addr));
 
-    
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
         return IPAddress();
     }
@@ -657,8 +660,8 @@ IPAddress WiFiSTAClass::networkID(){
     Ipv4 ip, gw, mask;
     atStationIp(& ip, & gw, & mask);
     return WiFiGenericClass::calculateNetworkID(
-        IPAddress((ip_addr_t *) & gw), 
-        IPAddress((ip_addr_t *) & mask)
+        IPAddress(gw),
+        IPAddress(mask)
     );
 }
 
@@ -680,7 +683,7 @@ uint8_t WiFiSTAClass::subnetCIDR(){
 
     Ipv4 ip, gw, mask;
     atStationIp(& ip, & gw, & mask);
-    return WiFiGenericClass::calculateSubnetCIDR(IPAddress((ip_addr_t *) & mask));
+    return WiFiGenericClass::calculateSubnetCIDR(IPAddress(mask));
 }
 
 /**
@@ -715,7 +718,7 @@ String WiFiSTAClass::psk() const{
     WifiLinkedAp ap;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
         atWifiConnect(& ap) == Fail ||
-        ap.bssid.isEmpty()){
+        ap.bssid.isNull){
         return String();
     }
     return token.pwd;
@@ -739,7 +742,7 @@ uint8_t * WiFiSTAClass::BSSID(void){
     WifiLinkedAp ap;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
         atWifiConnect(& ap) == Fail ||
-        ap.bssid.isEmpty()){
+        ap.bssid.isNull){
         return NULL;
     }
     memcpy(bssid, (uint8_t *)ap.bssid, 6);
@@ -777,7 +780,7 @@ int8_t WiFiSTAClass::RSSI(void){
     WifiLinkedAp ap;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
         atWifiConnect(& ap) == Fail ||
-        ap.bssid.isEmpty()){
+        ap.bssid.isNull){
         return 0;
     }
     return ap.rssi;
@@ -797,7 +800,7 @@ const char * WiFiSTAClass::getHostname(){
     // }
     // return hostname;
 
-    static String hostName;
+    static Text hostName;
     if (WiFiGenericClass::getMode() == WIFI_MODE_NULL ||
         atStationHostName(& hostName) == Fail){
         return NULL;
@@ -874,7 +877,7 @@ bool WiFiSTAClass::beginSmartConfig() {
     // TODO aynsc response event-----------------------------------------------------------------------------------------------------------------------------
     atApStopSmart();
     return result;
-    
+
     // if (_smartConfigStarted) {
     //     return false;
     // }
@@ -934,27 +937,27 @@ const char * sc_type_strings[] = {
 #endif
 
 void WiFiSTAClass::_smartConfigCallback(uint32_t st, void* result) {
-    smartconfig_status_t status = (smartconfig_status_t) st;
-    log_d("Status: %s", sc_status_strings[st % 5]);
-    if (status == SC_STATUS_GETTING_SSID_PSWD) {
-#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-        smartconfig_type_t * type = (smartconfig_type_t *)result;
-        log_d("Type: %s", sc_type_strings[*type % 3]);
-#endif
-    } else if (status == SC_STATUS_LINK) {
-        wifi_sta_config_t *sta_conf = reinterpret_cast<wifi_sta_config_t *>(result);
-        log_d("SSID: %s", (char *)(sta_conf->ssid));
-        sta_conf->bssid_set = 0;
-        esp_wifi_set_config(WIFI_IF_STA, (wifi_config_t *)sta_conf);
-        esp_wifi_connect();
-        _smartConfigDone = true;
-    } else if (status == SC_STATUS_LINK_OVER) {
-        if(result){
-#if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
-            ip4_addr_t * ip = (ip4_addr_t *)result;
-            log_d("Sender IP: " IPSTR, IP2STR(ip));
-#endif
-        }
-        WiFi.stopSmartConfig();
-    }
+//     smartconfig_status_t status = (smartconfig_status_t) st;
+//     log_d("Status: %s", sc_status_strings[st % 5]);
+//     if (status == SC_STATUS_GETTING_SSID_PSWD) {
+// #if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
+//         smartconfig_type_t * type = (smartconfig_type_t *)result;
+//         log_d("Type: %s", sc_type_strings[*type % 3]);
+// #endif
+//     } else if (status == SC_STATUS_LINK) {
+//         wifi_sta_config_t *sta_conf = reinterpret_cast<wifi_sta_config_t *>(result);
+//         log_d("SSID: %s", (char *)(sta_conf->ssid));
+//         sta_conf->bssid_set = 0;
+//         esp_wifi_set_config(WIFI_IF_STA, (wifi_config_t *)sta_conf);
+//         esp_wifi_connect();
+//         _smartConfigDone = true;
+//     } else if (status == SC_STATUS_LINK_OVER) {
+//         if(result){
+// #if ARDUHAL_LOG_LEVEL >= ARDUHAL_LOG_LEVEL_DEBUG
+//             ip4_addr_t * ip = (ip4_addr_t *)result;
+//             log_d("Sender IP: " IPSTR, IP2STR(ip));
+// #endif
+//         }
+//         WiFi.stopSmartConfig();
+//     }
 }

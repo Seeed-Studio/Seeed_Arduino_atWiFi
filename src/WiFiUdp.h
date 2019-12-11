@@ -35,7 +35,7 @@
 #ifndef _WIFIUDP_H_
 #define _WIFIUDP_H_
 
-#include "UnifiedAtType.h"
+#include "WiFiType.h"
 #include <Arduino.h>
 #include <Udp.h>
 // #include <cbuf.h>

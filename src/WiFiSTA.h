@@ -28,9 +28,9 @@
 #include "WiFiGeneric.h"
 
 struct WifiToken{
-    String ssid;
-    String pwd;
-    mac    bssid;
+    Text   ssid;
+    Text   pwd;
+    Mac    bssid;
 };
 
 class WiFiSTAClass

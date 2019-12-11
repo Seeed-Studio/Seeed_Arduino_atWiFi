@@ -109,14 +109,14 @@ void WiFiClass::printDiag(Print& p)
     */
 
     p.print("SSID (");
-    p.print(token.ssid);
+    p.print(token.ssid.c_str());
     p.print("): ");
-    p.println(ssid);
+    p.println(token.ssid.c_str());
 
     p.print("Passphrase (");
-    p.print(token.pwd.size());
+    p.print(token.pwd.length());
     p.print("): ");
-    p.println(token.pwd);
+    p.println(token.pwd.c_str());
 
     uint8_t * mac = token.bssid;
     p.print("BSSID set: ");

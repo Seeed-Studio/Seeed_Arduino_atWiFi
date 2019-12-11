@@ -17,8 +17,11 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+// !!! current, Not usable
+#if 0
+
 #include "WiFiClient.h"
-#include "WiFi.h"
+#include "Seeed_Arduino_atWiFi.h"
 #include <lwip/sockets.h>
 #include <lwip/netdb.h>
 #include <errno.h>
@@ -587,3 +590,4 @@ int WiFiClient::fd() const
     }
 }
 
+#endif
