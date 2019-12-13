@@ -392,4 +392,10 @@ typedef struct {
     system_event_info_t   event_info;    /**< event information */
 } system_event_t;
 
+// FOR ESP-LIB
+#define log_e(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
+#define log_i(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
+#define log_d(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
+#define log_w(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
+
 #endif /* ESP32WIFITYPE_H_ */
