@@ -22,6 +22,9 @@
 
 #ifndef ESP32WIFITYPE_H_
 #define ESP32WIFITYPE_H_
+
+// #define DEBUG	1
+
 #include "UnifiedAtType.h"
 
 #define WIFI_SCAN_RUNNING   (-1)
@@ -393,9 +396,16 @@ typedef struct {
 } system_event_t;
 
 // FOR ESP-LIB
+#if defined(DEBUG) && DEBUG
 #define log_e(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
 #define log_i(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
 #define log_d(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
 #define log_w(...)	do { Serial.printf(__VA_ARGS__); Serial.println(); } while (0)
+#else
+#define log_e(...)
+#define log_i(...)
+#define log_d(...)
+#define log_w(...)
+#endif
 
 #endif /* ESP32WIFITYPE_H_ */

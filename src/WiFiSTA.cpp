@@ -17,10 +17,6 @@ extern "C" {
 // // -----------------------------------------------------------------------------------------------------------------------
 // // ---------------------------------------------------- Private functions ------------------------------------------------
 // // -----------------------------------------------------------------------------------------------------------------------
-
-// static bool sta_config_equal(const wifi_config_t& lhs, const wifi_config_t& rhs);
-
-
 // /**
 //  * compare two STA configurations
 //  * @param lhs station_config
@@ -33,6 +29,14 @@ extern "C" {
 //     }
 //     return true;
 // }
+static bool sta_config_equal(const WifiLinkedAp& lhs, const WifiLinkedAp& rhs) {
+    if (lhs.ssid == rhs.ssid &&
+        lhs.bssid == rhs.bssid)
+    {
+        return true;
+    }
+    return false;
+}
 
 // -----------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------- STA function -----------------------------------------------------
@@ -108,74 +112,6 @@ wl_status_t WiFiSTAClass::status(){
  * @return
  */
 wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_t channel, const uint8_t* bssid, bool connect){
-    // if(!WiFi.enableSTA(true)) {
-    //     log_e("STA enable failed!");
-    //     return WL_CONNECT_FAILED;
-    // }
-
-    // if(!ssid || *ssid == 0x00 || strlen(ssid) > 31) {
-    //     log_e("SSID too long or missing!");
-    //     return WL_CONNECT_FAILED;
-    // }
-
-    // if(passphrase && strlen(passphrase) > 64) {
-    //     log_e("passphrase too long!");
-    //     return WL_CONNECT_FAILED;
-    // }
-
-    // wifi_config_t conf;
-    // memset(&conf, 0, sizeof(wifi_config_t));
-    // strcpy(reinterpret_cast<char*>(conf.sta.ssid), ssid);
-
-    // if(passphrase) {
-    //     if (strlen(passphrase) == 64){ // it's not a passphrase, is the PSK
-    //         memcpy(reinterpret_cast<char*>(conf.sta.password), passphrase, 64);
-    //     } else {
-    //         strcpy(reinterpret_cast<char*>(conf.sta.password), passphrase);
-    //     }
-    // }
-
-    // if(bssid) {
-    //     conf.sta.bssid_set = 1;
-    //     memcpy((void *) &conf.sta.bssid[0], (void *) bssid, 6);
-    // }
-
-    // if(channel > 0 && channel <= 13) {
-    //     conf.sta.channel = channel;
-    // }
-
-    // wifi_config_t current_conf;
-    // esp_wifi_get_config(WIFI_IF_STA, &current_conf);
-    // if(!sta_config_equal(current_conf, conf)) {
-    //     if(esp_wifi_disconnect()){
-    //         log_e("disconnect failed!");
-    //         return WL_CONNECT_FAILED;
-    //     }
-
-    //     esp_wifi_set_config(WIFI_IF_STA, &conf);
-    // } else if(status() == WL_CONNECTED){
-    //     return WL_CONNECTED;
-    // } else {
-    //     esp_wifi_set_config(WIFI_IF_STA, &conf);
-    // }
-
-    // if(!_useStaticIp) {
-    //     if(tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA) == ESP_ERR_TCPIP_ADAPTER_DHCPC_START_FAILED){
-    //         log_e("dhcp client start failed!");
-    //         return WL_CONNECT_FAILED;
-    //     }
-    // } else {
-    //     tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
-    // }
-
-    // if(connect && esp_wifi_connect()) {
-    //     log_e("connect failed!");
-    //     return WL_CONNECT_FAILED;
-    // }
-
-    // return status();
-
-
     if(!WiFi.enableSTA(true)) {
         log_e("STA enable failed!");
         return WL_CONNECT_FAILED;
@@ -191,9 +127,80 @@ wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_
         return WL_CONNECT_FAILED;
     }
 
-    WifiLinkedAp ap;
-    atWifiConnect(& ap);
+    // wifi_config_t conf;
+    // memset(&conf, 0, sizeof(wifi_config_t));
+    // strcpy(reinterpret_cast<char*>(conf.sta.ssid), ssid);
+    WifiLinkedAp conf;
+    conf.ssid = ssid;
 
+    // if(passphrase) {
+    //     if (strlen(passphrase) == 64){ // it's not a passphrase, is the PSK
+    //         memcpy(reinterpret_cast<char*>(conf.sta.password), passphrase, 64);
+    //     } else {
+    //         strcpy(reinterpret_cast<char*>(conf.sta.password), passphrase);
+    //     }
+    // }
+    /* TODO: PSK not support */
+    conf.password = passphrase;
+
+    // if(bssid) {
+    //     conf.sta.bssid_set = 1;
+    //     memcpy((void *) &conf.sta.bssid[0], (void *) bssid, 6);
+    // }
+    if (bssid) {
+        conf.bssid_set = true;
+        conf.bssid = Mac(bssid);
+    }
+
+    // if(channel > 0 && channel <= 13) {
+    //     conf.sta.channel = channel;
+    // }
+    if (channel > 0 && channel <= 13) {
+        conf.channel = channel;
+    }
+
+    // wifi_config_t current_conf;
+    // esp_wifi_get_config(WIFI_IF_STA, &current_conf);
+    // if(!sta_config_equal(current_conf, conf)) {
+    //     if(esp_wifi_disconnect()){
+    //         log_e("disconnect failed!");
+    //         return WL_CONNECT_FAILED;
+    //     }
+    //     esp_wifi_set_config(WIFI_IF_STA, &conf);
+    // } else if(status() == WL_CONNECTED){
+    //     return WL_CONNECTED;
+    // } else {
+    //     esp_wifi_set_config(WIFI_IF_STA, &conf);
+    // }
+    WifiLinkedAp cur_conf;
+    atWifiConnect(&cur_conf);
+    if (!sta_config_equal(cur_conf, conf)) {
+        if (atWifiDisconnect() != Success) {
+            log_e("disconnect failed!");
+            return WL_CONNECT_FAILED;
+        }
+        atWifiConnect(conf.ssid, conf.password);
+    } else if(status() == WL_CONNECTED){
+        return WL_CONNECTED;
+    } else {
+        atWifiConnect(conf.ssid, conf.password);
+    }
+
+    // if(!_useStaticIp) {
+    //     if(tcpip_adapter_dhcpc_start(TCPIP_ADAPTER_IF_STA) == ESP_ERR_TCPIP_ADAPTER_DHCPC_START_FAILED){
+    //         log_e("dhcp client start failed!");
+    //         return WL_CONNECT_FAILED;
+    //     }
+    // } else {
+    //     tcpip_adapter_dhcpc_stop(TCPIP_ADAPTER_IF_STA);
+    // }
+
+    // if(connect && esp_wifi_connect()) {
+    //     log_e("connect failed!");
+    //     return WL_CONNECT_FAILED;
+    // }
+
+    /*
     if (!ap.bssid.isNull && strncmp((char *)ap.bssid, (char *)bssid, 6) != 0){
         if (atWifiDisconnect() == Fail){
             log_e("disconnect failed!");
@@ -209,6 +216,7 @@ wl_status_t WiFiSTAClass::begin(const char* ssid, const char *passphrase, int32_
     if (bssid){
         token.bssid = Mac(bssid);
     }
+    */
     return status();
 }
 
@@ -682,9 +690,10 @@ uint8_t WiFiSTAClass::subnetCIDR(){
  * @return SSID
  */
 String WiFiSTAClass::SSID() const {
-    // if(WiFiGenericClass::getMode() == WIFI_MODE_NULL){
-    //     return String();
-    // }
+    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
+        return String();
+    }
+
     // wifi_ap_record_t info;
     // if(!esp_wifi_sta_get_ap_info(&info)) {
     //     return String(reinterpret_cast<char*>(info.ssid));
@@ -692,9 +701,7 @@ String WiFiSTAClass::SSID() const {
     // return String();
 
     WifiLinkedAp ap;
-    if (WiFiGenericClass::getMode() == WIFI_MODE_NULL){
-        return String();
-    }
+
     if (atWifiConnect(& ap) == Success){
         return ap.ssid;
     }

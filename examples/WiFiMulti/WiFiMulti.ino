@@ -21,7 +21,7 @@ void setup()
     if(wifiMulti.run() == WL_CONNECTED) {
         Serial.println("");
         Serial.println("WiFi connected");
-        Serial.println("IP address: ");
+        Serial.print  ("IP address: ");
         Serial.println(WiFi.localIP());
     }
 }
@@ -31,5 +31,11 @@ void loop()
     if(wifiMulti.run() != WL_CONNECTED) {
         Serial.println("WiFi not connected!");
         delay(1000);
+    } else {
+        Serial.println("");
+        Serial.println("WiFi connected");
+        Serial.print  ("IP address: ");
+        Serial.println(WiFi.localIP());
+        delay(5000);
     }
 }
