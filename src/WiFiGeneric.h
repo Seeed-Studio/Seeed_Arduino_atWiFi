@@ -25,6 +25,8 @@
 
 #include <esp_err.h>
 #include <esp_event_loop.h>
+#undef max
+#undef min
 #include <functional>
 #include "WiFiType.h"
 
