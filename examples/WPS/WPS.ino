@@ -14,7 +14,7 @@ Author:
 Pranav Cherukupalli <cherukupallip@gmail.com>
 */
 
-#include "WiFi.h"
+#include "AtWiFi.h"
 #include "esp_wps.h"
 /*
 Change the definition of the WPS mode

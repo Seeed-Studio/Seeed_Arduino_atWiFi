@@ -4,7 +4,7 @@
      Public domain - 2017
 */
 
-#include <WiFi.h>
+#include <AtWiFi.h>
 
 const char* ssid     = "your_network_name";
 const char* password = "your_network_password";

@@ -11,7 +11,7 @@
   by Elochukwu Ifediora (fedy0)
 */
 
-#include <WiFi.h>
+#include <AtWiFi.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
 

@@ -6,7 +6,7 @@
  *
  */
 
-#include <WiFi.h>
+#include <AtWiFi.h>
 
 const char* ssid     = "your-ssid";
 const char* password = "your-password";

@@ -3,7 +3,7 @@
  *
  */
 
-#include <WiFi.h>
+#include "AtWiFi.h"
 #include <WiFiMulti.h>
 
 WiFiMulti wifiMulti;
