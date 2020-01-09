@@ -431,6 +431,9 @@ size_t WiFiClient::write(Stream &stream)
 int WiFiClient::read(uint8_t *buf, size_t size)
 {
     int res = -1;
+
+    if(!_rxBuffer)
+        return res;
     res = _rxBuffer->read(buf, size);
     if(_rxBuffer->failed()) {
         log_e("fail on fd %d, errno: %d, \"%s\"", fd(), errno, strerror(errno));
@@ -441,6 +444,9 @@ int WiFiClient::read(uint8_t *buf, size_t size)
 
 int WiFiClient::peek()
 {
+    if(!_rxBuffer)
+        return -1;
+
     int res = _rxBuffer->peek();
     if(_rxBuffer->failed()) {
         log_e("fail on fd %d, errno: %d, \"%s\"", fd(), errno, strerror(errno));
