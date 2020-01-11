@@ -85,6 +85,10 @@ void loop()
     // Read all the lines of the reply from server and print them to Serial
     while(client.available()) {
         String line = client.readStringUntil('\r');
+        // Proceed various line-endings
+        line.replace("\r\n", "\n");
+        line.replace('\r', '\n');
+        line.replace("\n", "\r\n");
         Serial.print(line);
     }
 

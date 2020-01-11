@@ -12,8 +12,10 @@ const char* host     = "example.com";
 const char* url      = "/index.html";
 
 IPAddress local_IP(192, 168, 31, 115);
+// Take care this gateway/subnet address
+// Must follow with the Access Point configuration.
 IPAddress gateway(192, 168, 31, 1);
-IPAddress subnet(255, 255, 0, 0);
+IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8); //optional
 IPAddress secondaryDNS(8, 8, 4, 4); //optional
 
@@ -83,6 +85,10 @@ void loop()
   // Read all the lines of the reply from server and print them to Serial
   while (client.available()) {
     String line = client.readStringUntil('\r');
+    // Proceed various line-endings
+    line.replace("\r\n", "\n");
+    line.replace('\r', '\n');
+    line.replace("\n", "\r\n");
     Serial.print(line);
   }
 

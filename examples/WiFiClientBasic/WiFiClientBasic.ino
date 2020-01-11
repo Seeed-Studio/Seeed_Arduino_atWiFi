@@ -60,24 +60,28 @@ void loop()
     //uncomment this line to send a basic document request to the server
     client.print("GET /index.html HTTP/1.1\n\n");
 
-  int maxloops = 0;
+    int maxloops = 0;
 
-  //wait for the server's reply to become available
-  while (!client.available() && maxloops < 1000)
-  {
-    maxloops++;
-    delay(1); //delay 1 msec
-  }
-  if (client.available() > 0)
-  {
-    //read back one line from the server
-    String line = client.readStringUntil('\r');
-    Serial.println(line);
-  }
-  else
-  {
-    Serial.println("client.available() timed out ");
-  }
+    //wait for the server's reply to become available
+    while (!client.available() && maxloops < 1000)
+    {
+        maxloops++;
+        delay(1); //delay 1 msec
+    }
+    if (client.available() > 0)
+    {
+        //read back one line from the server
+        String line = client.readStringUntil('\r');
+        // Proceed various line-endings
+        line.replace("\r\n", "\n");
+        line.replace('\r', '\n');
+        line.replace("\n", "\r\n");
+        Serial.println(line);
+    }
+    else
+    {
+        Serial.println("client.available() timed out ");
+    }
 
     Serial.println("Closing connection.");
     client.stop();
