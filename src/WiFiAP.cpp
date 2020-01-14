@@ -167,7 +167,7 @@ bool WiFiAPClass::softAPConfig(IPAddress local_ip, IPAddress gateway, IPAddress 
 
         tcpip_adapter_dhcps_option(
             (tcpip_adapter_option_mode_t)TCPIP_ADAPTER_OP_SET,
-            (tcpip_adapter_option_id_t)REQUESTED_IP_ADDRESS,
+            (tcpip_adapter_option_id_t)TCPIP_ADAPTER_REQUESTED_IP_ADDRESS,
             (void*)&lease, sizeof(dhcps_lease_t)
         );
 
