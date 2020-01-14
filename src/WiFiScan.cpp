@@ -27,20 +27,13 @@
 #include "WiFiGeneric.h"
 #include "WiFiScan.h"
 
-extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include <esp_err.h>
-#include <esp_wifi.h>
-#include <esp_event_loop.h>
-#include <esp32-hal.h>
-#include <lwip/ip_addr.h>
-#include "lwip/err.h"
-}
+#include "Seeed_atUnified.h"
 
 bool WiFiScanClass::_scanAsync = false;
 uint32_t WiFiScanClass::_scanStarted = 0;

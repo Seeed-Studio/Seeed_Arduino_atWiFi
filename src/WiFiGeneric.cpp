@@ -25,33 +25,20 @@
 #include "WiFi.h"
 #include "WiFiGeneric.h"
 
-extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-
-#include <esp_err.h>
-#include <esp_wifi.h>
-#include <esp_event_loop.h>
-#include "lwip/ip_addr.h"
-#include "lwip/opt.h"
-#include "lwip/err.h"
-#include "lwip/dns.h"
-#include "esp_ipc.h"
-
-
-} //extern "C"
-
-#include "esp32-hal-log.h"
+#include "Seeed_atUnified.h"
 #include <vector>
-#include "sdkconfig.h"
 
 static xQueueHandle _network_event_queue;
 static TaskHandle_t _network_event_task_handle = NULL;
 static EventGroupHandle_t _network_event_group = NULL;
+
+#define xTaskCreateUniversal(t,n,s,a,p,h,cid) xTaskCreate(t,n,s,a,p,h);
 
 static void _network_event_task(void * arg){
     system_event_t event;
@@ -482,6 +469,7 @@ void WiFiGenericClass::enableLongRange(bool enable)
  */
 bool WiFiGenericClass::mode(wifi_mode_t m)
 {
+    log_e("%s() +++ L%d\n", __func__, __LINE__);
     wifi_mode_t cm = getMode();
     if(cm == m) {
         return true;

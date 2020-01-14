@@ -18,12 +18,11 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#if 0
 #include "ETH.h"
 #include "eth_phy/phy.h"
-#include "eth_phy/phy_tlk110.h"
-#include "eth_phy/phy_lan8720.h"
-#include "lwip/err.h"
-#include "lwip/dns.h"
+#include "lwip_err.h"
+#include "lwip_dns.h"
 
 extern void tcpipInit();
 
@@ -286,3 +285,4 @@ String ETHClass::macAddress(void)
 }
 
 ETHClass ETH;
+#endif

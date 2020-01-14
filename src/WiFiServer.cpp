@@ -17,8 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "WiFiServer.h"
-#include <lwip/sockets.h>
-#include <lwip/netdb.h>
+#include "Seeed_atUnified.h"
 
 #undef write
 #undef close
@@ -47,9 +46,9 @@ WiFiClient WiFiServer::available(){
     _accepted_sockfd = -1;
   }
   else {
-  struct sockaddr_in _client;
-  int cs = sizeof(struct sockaddr_in);
-    client_sock = lwip_accept_r(sockfd, (struct sockaddr *)&_client, (socklen_t*)&cs);
+    struct sockaddr_in _client;
+    int cs = sizeof(struct sockaddr_in);
+    client_sock = atu_accept_r(sockfd, (struct sockaddr *)&_client, (socklen_t*)&cs);
   }
   if(client_sock >= 0){
     int val = 1;
@@ -79,7 +78,7 @@ void WiFiServer::begin(uint16_t port){
     return;
   if(listen(sockfd , _max_clients) < 0)
     return;
-  fcntl(sockfd, F_SETFL, O_NONBLOCK);
+  fcntlsocket(sockfd, F_SETFL, O_NONBLOCK);
   _listening = true;
   _noDelay = false;
   _accepted_sockfd = -1;
@@ -99,7 +98,7 @@ bool WiFiServer::hasClient() {
     }
     struct sockaddr_in _client;
     int cs = sizeof(struct sockaddr_in);
-    _accepted_sockfd = lwip_accept_r(sockfd, (struct sockaddr *)&_client, (socklen_t*)&cs);
+    _accepted_sockfd = atu_accept_r(sockfd, (struct sockaddr *)&_client, (socklen_t*)&cs);
     if (_accepted_sockfd >= 0) {
       return true;
     }
@@ -107,7 +106,7 @@ bool WiFiServer::hasClient() {
 }
 
 void WiFiServer::end(){
-  lwip_close_r(sockfd);
+  closesocket(sockfd);
   sockfd = -1;
   _listening = false;
 }

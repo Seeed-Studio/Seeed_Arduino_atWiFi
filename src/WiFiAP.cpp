@@ -26,19 +26,14 @@
 #include "WiFiGeneric.h"
 #include "WiFiAP.h"
 
-extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
 #include <string.h>
-#include <esp_err.h>
-#include <esp_wifi.h>
-#include <esp_event_loop.h>
-#include <lwip/ip_addr.h>
-#include "dhcpserver/dhcpserver_options.h"
-}
+#include "Seeed_atUnified.h"
+
 
 
 

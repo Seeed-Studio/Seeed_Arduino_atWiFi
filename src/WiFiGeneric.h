@@ -23,8 +23,7 @@
 #ifndef ESP32WIFIGENERIC_H_
 #define ESP32WIFIGENERIC_H_
 
-#include <esp_err.h>
-#include <esp_event_loop.h>
+#include "Seeed_atUnified.h"
 #undef max
 #undef min
 #include <functional>

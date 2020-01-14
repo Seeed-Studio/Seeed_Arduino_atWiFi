@@ -17,8 +17,7 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 #include "WiFiUdp.h"
-#include <lwip/sockets.h>
-#include <lwip/netdb.h>
+#include "Seeed_atUnified.h"
 #include <errno.h>
 
 #undef write
@@ -70,7 +69,7 @@ uint8_t WiFiUDP::begin(IPAddress address, uint16_t port){
     stop();
     return 0;
   }
-  fcntl(udp_server, F_SETFL, O_NONBLOCK);
+  fcntlsocket(udp_server, F_SETFL, O_NONBLOCK);
   return 1;
 }
 
@@ -116,7 +115,7 @@ void WiFiUDP::stop(){
     setsockopt(udp_server, IPPROTO_IP, IP_DROP_MEMBERSHIP, &mreq, sizeof(mreq));
     multicast_ip = IPAddress(INADDR_ANY);
   }
-  close(udp_server);
+  closesocket(udp_server);
   udp_server = -1;
 }
 
@@ -152,7 +151,7 @@ int WiFiUDP::beginPacket(){
     return 0;
   }
 
-  fcntl(udp_server, F_SETFL, O_NONBLOCK);
+  fcntlsocket(udp_server, F_SETFL, O_NONBLOCK);
 
   return 1;
 }

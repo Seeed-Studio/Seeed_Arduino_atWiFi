@@ -26,7 +26,7 @@
 #include "WiFiMulti.h"
 #include <limits.h>
 #include <string.h>
-#include <esp32-hal.h>
+#include "Seeed_atUnified.h"
 
 WiFiMulti::WiFiMulti()
 {

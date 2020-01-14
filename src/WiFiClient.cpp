@@ -19,8 +19,7 @@
 
 #include "WiFiClient.h"
 #include "WiFi.h"
-#include <lwip/sockets.h>
-#include <lwip/netdb.h>
+#include "Seeed_atUnified.h"
 #include <errno.h>
 
 #define WIFI_CLIENT_MAX_WRITE_RETRY   (10)
@@ -46,7 +45,7 @@ private:
                 return 0;
             }
             int count;
-            int res = lwip_ioctl_r(_fd, FIONREAD, &count);
+            int res = atu_ioctl_r(_fd, FIONREAD, &count);
             if(res < 0) {
                 _failed = true;
                 return 0;
@@ -146,7 +145,10 @@ public:
     }
 
     size_t available(){
-        return _fill - _pos + r_available();
+        if (_fill - _pos) {
+            return _fill - _pos;
+        }
+        return r_available();
     }
 };
 
@@ -161,7 +163,7 @@ public:
 
     ~WiFiClientSocketHandle()
     {
-        close(sockfd);
+        closesocket(sockfd);
     }
 
     int fd()
@@ -212,7 +214,7 @@ int WiFiClient::connect(IPAddress ip, uint16_t port, int32_t timeout)
         log_e("socket: %d", errno);
         return 0;
     }
-    fcntl( sockfd, F_SETFL, fcntl( sockfd, F_GETFL, 0 ) | O_NONBLOCK );
+    fcntlsocket( sockfd, F_SETFL, fcntlsocket( sockfd, F_GETFL, 0 ) | O_NONBLOCK );
 
     uint32_t ip_addr = ip;
     struct sockaddr_in serveraddr;
@@ -227,21 +229,21 @@ int WiFiClient::connect(IPAddress ip, uint16_t port, int32_t timeout)
     tv.tv_sec = 0;
     tv.tv_usec = timeout * 1000;
 
-    int res = lwip_connect_r(sockfd, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
+    int res = atu_connect_r(sockfd, (struct sockaddr*)&serveraddr, sizeof(serveraddr));
     if (res < 0 && errno != EINPROGRESS) {
         log_e("connect on fd %d, errno: %d, \"%s\"", sockfd, errno, strerror(errno));
-        close(sockfd);
+        closesocket(sockfd);
         return 0;
     }
 
     res = select(sockfd + 1, nullptr, &fdset, nullptr, timeout<0 ? nullptr : &tv);
     if (res < 0) {
         log_e("select on fd %d, errno: %d, \"%s\"", sockfd, errno, strerror(errno));
-        close(sockfd);
+        closesocket(sockfd);
         return 0;
     } else if (res == 0) {
         log_i("select returned due to timeout %d ms for fd %d", timeout, sockfd);
-        close(sockfd);
+        closesocket(sockfd);
         return 0;
     } else {
         int sockerr;
@@ -250,18 +252,18 @@ int WiFiClient::connect(IPAddress ip, uint16_t port, int32_t timeout)
 
         if (res < 0) {
             log_e("getsockopt on fd %d, errno: %d, \"%s\"", sockfd, errno, strerror(errno));
-            close(sockfd);
+            closesocket(sockfd);
             return 0;
         }
 
         if (sockerr != 0) {
             log_e("socket error on fd %d, errno: %d, \"%s\"", sockfd, sockerr, strerror(sockerr));
-            close(sockfd);
+            closesocket(sockfd);
             return 0;
         }
     }
 
-    fcntl( sockfd, F_SETFL, fcntl( sockfd, F_GETFL, 0 ) & (~O_NONBLOCK) );
+    fcntlsocket( sockfd, F_SETFL, fcntlsocket( sockfd, F_GETFL, 0 ) & (~O_NONBLOCK) );
     clientSocketHandle.reset(new WiFiClientSocketHandle(sockfd));
     _rxBuffer.reset(new WiFiClientRxBuffer(sockfd));
     _connected = true;
