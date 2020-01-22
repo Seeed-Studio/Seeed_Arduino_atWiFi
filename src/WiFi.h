@@ -1,5 +1,5 @@
 /*
- WiFi.h - esp32 Wifi support.
+ AtWiFi.h - esp32 Wifi support.
  Based on WiFi.h from Arduino WiFi shield library.
  Copyright (c) 2011-2014 Arduino.  All right reserved.
  Modified by Ivan Grokhotkov, December 2014
@@ -19,8 +19,8 @@
  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef WiFi_h
-#define WiFi_h
+#ifndef AtWiFi_h
+#define AtWiFi_h
 
 #include <stdint.h>
 
@@ -64,4 +64,4 @@ public:
 
 extern WiFiClass WiFi;
 
-#endif
+#endif//AtWiFi_h
