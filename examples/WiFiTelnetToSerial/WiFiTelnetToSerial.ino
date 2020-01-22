@@ -20,7 +20,8 @@
 */
 #include <AtWiFi.h>
 #include <WiFiMulti.h>
-
+#undef Serial
+#undef Serial2
 WiFiMulti wifiMulti;
 
 //how many clients should be able to telnet to this ESP32
@@ -56,11 +57,10 @@ void setup() {
   if (wifiMulti.run() != WL_CONNECTED) {
     Serial.println("WiFi connect failed");
     delay(1000);
-    ESP.restart();
   }
 
   //start UART and the server
-  Serial2.begin(9600);
+  Serial2.begin(115200);
   server.begin();
   server.setNoDelay(true);
 
