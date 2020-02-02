@@ -1,10 +1,10 @@
 /*
- *  This sketch sends data via HTTP GET requests to data.sparkfun.com service.
- *
- *  You need to get streamId and privateKey at data.sparkfun.com and paste them
- *  below. Or just customize this script to talk to other HTTP servers.
- *
- */
+    This sketch sends data via HTTP GET requests to data.sparkfun.com service.
+
+    You need to get streamId and privateKey at data.sparkfun.com and paste them
+    below. Or just customize this script to talk to other HTTP servers.
+
+*/
 
 #include <AtWiFi.h>
 
@@ -15,8 +15,7 @@ const char* host = "data.sparkfun.com";
 const char* streamId   = "....................";
 const char* privateKey = "....................";
 
-void setup()
-{
+void setup() {
     Serial.begin(115200);
     delay(10);
 
@@ -42,8 +41,7 @@ void setup()
 
 int value = 0;
 
-void loop()
-{
+void loop() {
     delay(5000);
     ++value;
 
@@ -83,7 +81,7 @@ void loop()
     }
 
     // Read all the lines of the reply from server and print them to Serial
-    while(client.available()) {
+    while (client.available()) {
         String line = client.readStringUntil('\r');
         // Proceed various line-endings
         line.replace("\r\n", "\n");

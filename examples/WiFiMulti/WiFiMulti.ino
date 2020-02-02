@@ -1,15 +1,14 @@
 /*
- *  This sketch trys to Connect to the best AP based on a given list
- *
- */
+    This sketch trys to Connect to the best AP based on a given list
+
+*/
 
 #include "AtWiFi.h"
 #include <WiFiMulti.h>
 
 WiFiMulti wifiMulti;
 
-void setup()
-{
+void setup() {
     Serial.begin(115200);
     delay(10);
 
@@ -18,7 +17,7 @@ void setup()
     wifiMulti.addAP("ssid_from_AP_3", "your_password_for_AP_3");
 
     Serial.println("Connecting Wifi...");
-    if(wifiMulti.run() == WL_CONNECTED) {
+    if (wifiMulti.run() == WL_CONNECTED) {
         Serial.println("");
         Serial.println("WiFi connected");
         Serial.println("IP address: ");
@@ -26,9 +25,8 @@ void setup()
     }
 }
 
-void loop()
-{
-    if(wifiMulti.run() != WL_CONNECTED) {
+void loop() {
+    if (wifiMulti.run() != WL_CONNECTED) {
         Serial.println("WiFi not connected!");
         delay(1000);
     }

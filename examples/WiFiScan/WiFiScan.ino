@@ -1,12 +1,11 @@
 /*
- *  This sketch demonstrates how to scan WiFi networks.
- *  The API is almost the same as with the WiFi Shield library,
- *  the most obvious difference being the different file you need to include:
- */
+    This sketch demonstrates how to scan WiFi networks.
+    The API is almost the same as with the WiFi Shield library,
+    the most obvious difference being the different file you need to include:
+*/
 #include "AtWiFi.h"
 
-void setup()
-{
+void setup() {
     Serial.begin(115200);
 
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
@@ -17,8 +16,7 @@ void setup()
     Serial.println("Setup done");
 }
 
-void loop()
-{
+void loop() {
     Serial.println("scan start");
 
     // WiFi.scanNetworks will return the number of networks found
@@ -37,7 +35,7 @@ void loop()
             Serial.print(" (");
             Serial.print(WiFi.RSSI(i));
             Serial.print(")");
-            Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+            Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
             delay(10);
         }
     }
