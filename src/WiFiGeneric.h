@@ -1,24 +1,24 @@
 /*
- ESP8266WiFiGeneric.h - esp8266 Wifi support.
- Based on WiFi.h from Ardiono WiFi shield library.
- Copyright (c) 2011-2014 Arduino.  All right reserved.
- Modified by Ivan Grokhotkov, December 2014
- Reworked by Markus Sattler, December 2015
+    ESP8266WiFiGeneric.h - esp8266 Wifi support.
+    Based on WiFi.h from Ardiono WiFi shield library.
+    Copyright (c) 2011-2014 Arduino.  All right reserved.
+    Modified by Ivan Grokhotkov, December 2014
+    Reworked by Markus Sattler, December 2015
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef ESP32WIFIGENERIC_H_
 #define ESP32WIFIGENERIC_H_
@@ -31,7 +31,7 @@
 
 typedef void (*WiFiEventCb)(system_event_id_t event);
 typedef std::function<void(system_event_id_t event, system_event_info_t info)> WiFiEventFuncCb;
-typedef void (*WiFiEventSysCb)(system_event_t *event);
+typedef void (*WiFiEventSysCb)(system_event_t* event);
 
 typedef size_t wifi_event_id_t;
 
@@ -62,12 +62,11 @@ static const int ETH_CONNECTED_BIT = BIT8;
 static const int ETH_HAS_IP_BIT    = BIT9;
 static const int ETH_HAS_IP6_BIT   = BIT10;
 static const int WIFI_SCANNING_BIT = BIT11;
-static const int WIFI_SCAN_DONE_BIT= BIT12;
+static const int WIFI_SCAN_DONE_BIT = BIT12;
 static const int WIFI_DNS_IDLE_BIT = BIT13;
 static const int WIFI_DNS_DONE_BIT = BIT14;
 
-class WiFiGenericClass
-{
+class WiFiGenericClass {
   public:
     WiFiGenericClass();
 
@@ -98,7 +97,7 @@ class WiFiGenericClass
     bool setTxPower(wifi_power_t power);
     wifi_power_t getTxPower();
 
-    static esp_err_t _eventCallback(void *arg, system_event_t *event);
+    static esp_err_t _eventCallback(void* arg, system_event_t* event);
 
   protected:
     static bool _persistent;
@@ -109,7 +108,7 @@ class WiFiGenericClass
     static int clearStatusBits(int bits);
 
   public:
-    static int hostByName(const char *aHostname, IPAddress &aResult);
+    static int hostByName(const char* aHostname, IPAddress& aResult);
 
     static IPAddress calculateNetworkID(IPAddress ip, IPAddress subnet);
     static IPAddress calculateBroadcast(IPAddress ip, IPAddress subnet);

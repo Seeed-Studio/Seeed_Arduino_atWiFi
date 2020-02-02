@@ -1,24 +1,24 @@
 /*
- ESP8266WiFiSTA.h - esp8266 Wifi support.
- Based on WiFi.h from Ardiono WiFi shield library.
- Copyright (c) 2011-2014 Arduino.  All right reserved.
- Modified by Ivan Grokhotkov, December 2014
- Reworked by Markus Sattler, December 2015
+    ESP8266WiFiSTA.h - esp8266 Wifi support.
+    Based on WiFi.h from Ardiono WiFi shield library.
+    Copyright (c) 2011-2014 Arduino.  All right reserved.
+    Modified by Ivan Grokhotkov, December 2014
+    Reworked by Markus Sattler, December 2015
 
- This library is free software; you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public
- License as published by the Free Software Foundation; either
- version 2.1 of the License, or (at your option) any later version.
+    This library is free software; you can redistribute it and/or
+    modify it under the terms of the GNU Lesser General Public
+    License as published by the Free Software Foundation; either
+    version 2.1 of the License, or (at your option) any later version.
 
- This library is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- Lesser General Public License for more details.
+    This library is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    Lesser General Public License for more details.
 
- You should have received a copy of the GNU Lesser General Public
- License along with this library; if not, write to the Free Software
- Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
- */
+    You should have received a copy of the GNU Lesser General Public
+    License along with this library; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+*/
 
 #ifndef ESP32WIFISTA_H_
 #define ESP32WIFISTA_H_
@@ -28,19 +28,21 @@
 #include "WiFiGeneric.h"
 
 
-class WiFiSTAClass
-{
+class WiFiSTAClass {
     // ----------------------------------------------------------------------------------------------
     // ---------------------------------------- STA function ----------------------------------------
     // ----------------------------------------------------------------------------------------------
 
-public:
+  public:
 
-    wl_status_t begin(const char* ssid, const char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL, bool connect = true);
-    wl_status_t begin(char* ssid, char *passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL, bool connect = true);
+    wl_status_t begin(const char* ssid, const char* passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL,
+                      bool connect = true);
+    wl_status_t begin(char* ssid, char* passphrase = NULL, int32_t channel = 0, const uint8_t* bssid = NULL,
+                      bool connect = true);
     wl_status_t begin();
 
-    bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000, IPAddress dns2 = (uint32_t)0x00000000);
+    bool config(IPAddress local_ip, IPAddress gateway, IPAddress subnet, IPAddress dns1 = (uint32_t)0x00000000,
+                IPAddress dns2 = (uint32_t)0x00000000);
 
     bool reconnect();
     bool disconnect(bool wifioff = false, bool eraseap = false);
@@ -58,7 +60,7 @@ public:
     // STA network info
     IPAddress localIP();
 
-    uint8_t * macAddress(uint8_t* mac);
+    uint8_t* macAddress(uint8_t* mac);
     String macAddress();
 
     IPAddress subnetMask();
@@ -68,34 +70,34 @@ public:
     IPAddress broadcastIP();
     IPAddress networkID();
     uint8_t subnetCIDR();
-    
+
     bool enableIpV6();
     IPv6Address localIPv6();
 
-    const char * getHostname();
-    bool setHostname(const char * hostname);
+    const char* getHostname();
+    bool setHostname(const char* hostname);
 
     // STA WiFi info
     static wl_status_t status();
     String SSID() const;
     String psk() const;
 
-    uint8_t * BSSID();
+    uint8_t* BSSID();
     String BSSIDstr();
 
     int8_t RSSI();
 
     static void _setStatus(wl_status_t status);
-protected:
+  protected:
     static bool _useStaticIp;
     static bool _autoReconnect;
 
-public: 
+  public:
     bool beginSmartConfig();
     bool stopSmartConfig();
     bool smartConfigDone();
 
-protected:
+  protected:
     static bool _smartConfigStarted;
     static bool _smartConfigDone;
     static void _smartConfigCallback(uint32_t status, void* result);

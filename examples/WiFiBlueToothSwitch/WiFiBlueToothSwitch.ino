@@ -22,59 +22,59 @@
 
 enum { STEP_BTON, STEP_BTOFF, STEP_STA, STEP_AP, STEP_AP_STA, STEP_OFF, STEP_BT_STA, STEP_END };
 
-void onButton(){
-  static uint32_t step = STEP_BTON;
-  switch(step){
-    case STEP_BTON://BT Only
-      Serial.println("** Starting BT");
-      btStart();
-    break;
-    case STEP_BTOFF://All Off
-      Serial.println("** Stopping BT");
-      btStop();
-    break;
-    case STEP_STA://STA Only
-      Serial.println("** Starting STA");
-      WiFi.begin(STA_SSID, STA_PASS);
-    break;
-    case STEP_AP://AP Only
-      Serial.println("** Stopping STA");
-      WiFi.mode(WIFI_AP);
-      Serial.println("** Starting AP");
-      WiFi.softAP(AP_SSID);
-    break;
-    case STEP_AP_STA://AP+STA
-      Serial.println("** Starting STA");
-      WiFi.begin(STA_SSID, STA_PASS);
-    break;
-    case STEP_OFF://All Off
-      Serial.println("** Stopping WiFi");
-      WiFi.mode(WIFI_OFF);
-    break;
-    case STEP_BT_STA://BT+STA
-      Serial.println("** Starting STA+BT");
-      WiFi.begin(STA_SSID, STA_PASS);
-      btStart();
-    break;
-    case STEP_END://All Off
-      Serial.println("** Stopping WiFi+BT");
-      WiFi.mode(WIFI_OFF);
-      btStop();
-    break;
-    default:
-    break;
-  }
-  if(step == STEP_END){
-    step = STEP_BTON;
-  } else {
-    step++;
-  }
-  //little debounce
-  delay(100);
+void onButton() {
+    static uint32_t step = STEP_BTON;
+    switch (step) {
+        case STEP_BTON://BT Only
+            Serial.println("** Starting BT");
+            btStart();
+            break;
+        case STEP_BTOFF://All Off
+            Serial.println("** Stopping BT");
+            btStop();
+            break;
+        case STEP_STA://STA Only
+            Serial.println("** Starting STA");
+            WiFi.begin(STA_SSID, STA_PASS);
+            break;
+        case STEP_AP://AP Only
+            Serial.println("** Stopping STA");
+            WiFi.mode(WIFI_AP);
+            Serial.println("** Starting AP");
+            WiFi.softAP(AP_SSID);
+            break;
+        case STEP_AP_STA://AP+STA
+            Serial.println("** Starting STA");
+            WiFi.begin(STA_SSID, STA_PASS);
+            break;
+        case STEP_OFF://All Off
+            Serial.println("** Stopping WiFi");
+            WiFi.mode(WIFI_OFF);
+            break;
+        case STEP_BT_STA://BT+STA
+            Serial.println("** Starting STA+BT");
+            WiFi.begin(STA_SSID, STA_PASS);
+            btStart();
+            break;
+        case STEP_END://All Off
+            Serial.println("** Stopping WiFi+BT");
+            WiFi.mode(WIFI_OFF);
+            btStop();
+            break;
+        default:
+            break;
+    }
+    if (step == STEP_END) {
+        step = STEP_BTON;
+    } else {
+        step++;
+    }
+    //little debounce
+    delay(100);
 }
 
-void WiFiEvent(WiFiEvent_t event){
-    switch(event) {
+void WiFiEvent(WiFiEvent_t event) {
+    switch (event) {
         case SYSTEM_EVENT_AP_START:
             Serial.println("AP Started");
             WiFi.softAPsetHostname(AP_SSID);
@@ -121,7 +121,7 @@ void setup() {
 void loop() {
     static uint8_t lastPinState = 1;
     uint8_t pinState = digitalRead(0);
-    if(!pinState && lastPinState){
+    if (!pinState && lastPinState) {
         onButton();
     }
     lastPinState = pinState;
