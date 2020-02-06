@@ -2,9 +2,8 @@ language: generic
 matrix:
   include:
     - env:
-        - BOARD="arduino:avr:uno"
-    - env:
-        - BOARD="Seeeduino:samd:seeed_XIAO_m0"
+        - BOARD="Seeeduino:samd:seeed_grove_ui_wireless"
+
 # default phases
 before_install:
   - mkdir -p "$HOME/bin"
@@ -23,156 +22,62 @@ before_install:
       cd "${HOME}/Arduino/libraries/${repositoryName}"
       cd "${TRAVIS_BUILD_DIR}"
     }
+  - installLibrary Seeed-Studio/Seeed_Arduino_FreeRTOS
+  - installLibrary Seeed-Studio/esp-at-lib
+  - installLibrary Seeed-Studio/Seeed_Arduino_atUnified
   - installLibrary Seeed-Studio/Seeed_Arduino_atWiFi
   - buildExampleSketch() { arduino-cli compile  --warnings all --fqbn $BOARD $PWD/examples/$1 --verbose; }
   - buildExampleUtilitySketch() { arduino-cli compile --warnings all --fqbn $BOARD $PWD/examples/utility/$1 --verbose; }
+
 install:
   - mkdir -p $HOME/Arduino/libraries
+
 script:
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiClientBasic;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiClient;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch SimpleWiFiServer;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiAccessPoint;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch WiFiBlueToothSwitch;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch WPS;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiScan;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch WiFiClientEnterprise;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiMulti;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch ETH_TLK110;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch WiFiIPv6;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiClientStaticIP;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiTelnetToSerial;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch ETH_LAN8720;
-      fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiUDPClient;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiSmartConfig;
       fi
     - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
+      if [ "$BOARD" == "Seeeduino:samd:seeed_grove_ui_wireless" ]; then
         buildExampleSketch WiFiClientEvents;
       fi
-    - |
-      if [ "$BOARD" == "arduino:avr:uno" ]; then
-        buildExampleSketch ETH_LAN8720_internal_clock;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiClientBasic;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiClient;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch SimpleWiFiServer;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiAccessPoint;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiBlueToothSwitch;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WPS;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiScan;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiClientEnterprise;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiMulti;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch ETH_TLK110;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiIPv6;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiClientStaticIP;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiTelnetToSerial;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch ETH_LAN8720;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiUDPClient;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiSmartConfig;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch WiFiClientEvents;
-      fi
-    - |
-      if [ "$BOARD" == "Seeeduino:samd:seeed_XIAO_m0" ]; then
-        buildExampleSketch ETH_LAN8720_internal_clock;
-      fi
+
 notifications:
   webhooks:
     urls:
