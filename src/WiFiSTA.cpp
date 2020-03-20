@@ -39,8 +39,6 @@
 // ---------------------------------------------------- Private functions ------------------------------------------------
 // -----------------------------------------------------------------------------------------------------------------------
 
-static bool sta_config_equal(const wifi_config_t& lhs, const wifi_config_t& rhs);
-
 
 /**
     compare two STA configurations
@@ -49,7 +47,9 @@ static bool sta_config_equal(const wifi_config_t& lhs, const wifi_config_t& rhs)
     @return equal
 */
 static bool sta_config_equal(const wifi_config_t& lhs, const wifi_config_t& rhs) {
-    if (memcmp(&lhs, &rhs, sizeof(wifi_config_t)) != 0) {
+    if (strcmp((char*)lhs.sta.ssid, (char*)rhs.sta.ssid)
+    // || memcmp((char*)lhs.sta.bssid, (char*)rhs.sta.bssid, sizeof rhs.sta.bssid)
+    ) {
         return false;
     }
     return true;
