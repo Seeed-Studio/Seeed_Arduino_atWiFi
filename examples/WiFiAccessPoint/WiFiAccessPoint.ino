@@ -3,9 +3,10 @@
 
     Steps:
     1. Connect to the access point "yourAp"
-    2. Point your web browser to http://192.168.4.1/H to turn the LED on or http://192.168.4.1/L to turn it off
+    2. Point your web browser to http://<This-AP-IP>/H to turn the LED on or http://<This-AP-IP>/L to turn it off
+       (<This-AP-IP> should be replaced with the IP got in terminal/SerilPort, see Note 1)
      OR
-     Run raw TCP "GET /H" and "GET /L" on PuTTY terminal with 192.168.4.1 as IP address and 80 as port
+     Run raw TCP "GET /H" and "GET /L" on PuTTY terminal with IP address (see Note 1) and 80 as port
 
     Created for arduino-esp32 on 04 July, 2018
     by Elochukwu Ifediora (fedy0)
@@ -15,7 +16,8 @@
 #include <WiFiClient.h>
 #include <WiFiAP.h>
 
-#define LED_BUILTIN 2   // Set the GPIO pin where you connected your test LED or comment this line out if your dev board has a built-in LED
+#define LED_BUILTIN 2   // Set the GPIO pin where you connected your test LED
+                        // or comment this line out if your dev board has a built-in LED
 
 // Set these to your desired credentials.
 const char* ssid = "yourAP";
@@ -34,6 +36,10 @@ void setup() {
     // You can remove the password parameter if you want the AP to be open.
     WiFi.softAP(ssid, password);
     IPAddress myIP = WiFi.softAPIP();
+    /*
+     * Note 1
+     * Record this IP, will used by Client (such as Web Browser)
+     */
     Serial.print("AP IP address: ");
     Serial.println(myIP);
     server.begin();
