@@ -457,7 +457,8 @@ void WiFiGenericClass::enableLongRange(bool enable) {
     @param m WiFiMode_t
 */
 bool WiFiGenericClass::mode(wifi_mode_t m) {
-    log_e("%s() +++ L%d\n", __func__, __LINE__);
+    log_v(" +++\n");
+
     wifi_mode_t cm = getMode();
     if (cm == m) {
         return true;
