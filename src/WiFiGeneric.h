@@ -88,6 +88,9 @@ class WiFiGenericClass {
     static bool mode(wifi_mode_t);
     static wifi_mode_t getMode();
 
+    static bool country(wifi_country_t);
+    static wifi_country_t getCountry();
+
     bool enableSTA(bool enable);
     bool enableAP(bool enable);
 

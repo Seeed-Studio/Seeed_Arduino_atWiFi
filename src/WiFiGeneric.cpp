@@ -515,6 +515,31 @@ wifi_mode_t WiFiGenericClass::getMode() {
     return mode;
 }
 
+
+bool WiFiGenericClass::country(wifi_country_t wc) {
+    esp_err_t err;
+
+    err = esp_wifi_set_country(&wc);
+    if (err) {
+        log_e("Could not set country! %d", err);
+        return false;
+    }
+    return true;
+}
+
+wifi_country_t WiFiGenericClass::getCountry() {
+    esp_err_t err;
+    wifi_country_t wc[1];
+
+    wc->cnty_rtl = 0xFFFFUL;
+
+    err = esp_wifi_get_country(wc);
+    if (err) {
+        log_e("Could not get country! %d", err);
+    }
+    return wc[0];
+}
+
 /**
     control STA mode
     @param enable bool
